@@ -75,7 +75,12 @@ namespace FutureSight.lib
 
     class CardDB
     {
-        public CardDB()
+        public static CardDB GetInstance()
+        {
+            return instance;
+        }
+
+        public void LoadCardDB()
         {
             cardDB = new Dictionary<int, Card>()
             {
@@ -91,5 +96,7 @@ namespace FutureSight.lib
         public Card get(int i) { return cardDB[i]; }
 
         private Dictionary<int, Card> cardDB;
+
+        private static CardDB instance = new CardDB();
     }
 }

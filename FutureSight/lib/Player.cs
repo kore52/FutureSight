@@ -26,8 +26,9 @@ namespace FutureSight.lib
 		public List<int> Exile { get; set; }
 		public List<int> Library { get; set; }
 		public List<int> Sideboard { get; set; }
-		
-		public void ShuffleLibrary() {}
+
+
+/*		public void ShuffleLibrary() {}
 		public void DrawCard()
 		{
 			Hand.Add(Library[0]);
@@ -35,5 +36,5 @@ namespace FutureSight.lib
 		}
 		public void PutLand(int no) {}
 		public void CastSpell(int no) {}
-	}
+*/	}
 }

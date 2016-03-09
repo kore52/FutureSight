@@ -13,9 +13,22 @@ namespace FutureSight.lib
 
         }
 
-        public void LoadResource()
+        public void Initialize()
         {
-            // カードデータ、デッキデータ等の読み込み
+            
         }
+
+        public void Calc()
+        {
+            var root = new GameState();
+            root.Calc();
+        }
+
+        public void EnumerateNextMove()
+        {
+            // 現在可能な動きを列挙する
+        }
+
+        private int player = 2;
     }
 }

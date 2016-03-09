@@ -33,10 +33,22 @@ namespace FutureSight.lib
 			turnQueue = new LinkedList<int>();
 			turnQueue.AddLast(0);
 			turnQueue.AddLast(1);
+            canPutLand = true;
 		}
 		
+        public void Calc()
+        {
+            // 取れうる行動を列挙
+
+            // 手札
+            foreach (var item in Players[GetActivePlayer()].Hand)
+            {
+                item
+            }
+        }
+
 		public int GetActivePlayer() { return turnQueue.First(); }
-		public List<Player> Player { get; set; }
+		public List<Player> Players { get; set; }
 		
 		public void ForwardTurn() { turns++; }
 		public int GetElapsedTurn() { return turns; }
@@ -45,8 +57,14 @@ namespace FutureSight.lib
 		private LinkedList<int> turnQueue;
 		private int turns;
 		private int step;
+        private bool canPutLand;
+
+        private List<string> nextMove;
 	}
 	
+    //-------------------------------------------------------------
+    // ディープコピー機能を持った拡張メソッド
+    //-------------------------------------------------------------
 	static class DeepCopyUtils
 	{
 		public static object DeepCopy(this object target)

@@ -70,6 +70,7 @@ namespace FutureSight.lib
         public int Power { get; set; }
         public int Toughness { get; set; }
         public string Effects { get; set; }
+
     }
 
     class CardDB

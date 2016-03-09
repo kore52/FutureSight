@@ -1,0 +1,16 @@
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<AssemblyName>FutureSight</AssemblyName>
+		<OutputPath>bin</OutputPath>
+		<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="lib\*.cs" />
+	</ItemGroup>
+	<Target Name="Build">
+		<MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')" />
+		<Csc Sources="@(Compile)" OutputAssembly="$(OutputPath)\$(AssemblyName).exe" />
+	</Target>
+</Project>

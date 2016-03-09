@@ -12,17 +12,22 @@ namespace FutureSight.lib
 	{
 		public GameState()
 		{
-			activePlayer = 0;
+			players = new List<int>() { 0, 1 };
+			
 			turns = 0;
+			turnQueue = new LinkedList<int>();
+			turnQueue.AddLast(0);
+			turnQueue.AddLast(1);
 		}
 		
-		//public Player GetActivePlayer() {}
-		//public List<Player> Player { get; set; }
+		public int GetActivePlayer() { return turnQueue.First(); }
+		public List<Player> Player { get; set; }
 		
 		public void ForwardTurn() { turns++; }
 		public int GetElapsedTurn() { return turns; }
 		
-		private int activePlayer;
+		private List<int> players;
+		private LinkedList<int> turnQueue;
 		private int turns;
 		private int step;
 	}

@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace FutureSight.lib
 {
-	[Flags]
 	enum Color
 	{
-		White,
+		White = 0,
 		Blue,
 		Black,
 		Red,
 		Green,
 		Multicolor,
-		Colorless
+		Colorless,
+        Generic
 	}
 
 	[Flags]
@@ -68,7 +68,7 @@ namespace FutureSight.lib
 		public int ConvertedManaCost() {
 			int cmc = 0;
 			MatchCollection mc = Regex.Matches(ManaCost, @"\{(.+)\}");
-			foreach (RegularExpressions.Match m in mc)
+			foreach (System.Text.RegularExpressions.Match m in mc)
 			{
 				switch (m.Value)
 				{
@@ -86,6 +86,7 @@ namespace FutureSight.lib
 					break;
 				default:
 					cmc += int.Parse(m.Value);
+                    break;
 				}
 			}
 			return cmc;
@@ -119,7 +120,17 @@ namespace FutureSight.lib
 			};
 		}
 
-		public Card get(int i) { return cardDB[i]; }
+		public Card get(int i)
+        {
+            try
+            {
+                return cardDB[i];
+            } catch (Exception)
+            {
+                LoadCardDB();
+                return cardDB[i];
+            }
+        }
 
 		private Dictionary<int, Card> cardDB;
 

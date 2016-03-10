@@ -34,47 +34,55 @@ namespace FutureSight.lib
 	public class GameState
 	{
 		public GameState()
-		{
-			players = new List<int>() { 0, 1 };
-			
+		{	
 			turns = 0;
 			turnQueue = new LinkedList<int>();
 			turnQueue.AddLast(0);
 			turnQueue.AddLast(1);
 			canPlayLand = true;
+
+            Players = new List<Player>();
+
+            step = GamePhase.Main1;
 		}
 		
 		public void Calc()
 		{
+            nextMove = new List<string>();
 			Player player = Players[GetActivePlayer()];
-			for (int i = 0; i < player.Hand.Length(); i++)
+			for (int i = 0; i < player.Hand.Count; i++)
 			{
 				Card item = CardDB.GetInstance().get(player.Hand[i]);
 				switch(step) {
-				case UntapStep: break;
-				case UpkeepStep:
-					if ((item.CardType & Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayer() + ":cast:" + i); }
+				case GamePhase.UntapStep: break;
+				case GamePhase.UpkeepStep:
+					if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayer() + ":cast:" + i); }
 					break;
-				case DrawStep:
-				case Main1:
-					if ((item.CardType & Land) && canPlayLand) { nextMove.Add(GetActivePlayer() + ":play:" + i); }
+				case GamePhase.DrawStep:
+				case GamePhase.Main1:
+					if (item.CardType.HasFlag(CardType.Land) && canPlayLand) { nextMove.Add(GetActivePlayer() + ":play:" + i); }
 					break;
-				case PreCombatStep:
-				case DeclareAttackerStep:
-				case DeclareBlockerStep:
-				case CombatDamageStep:
-				case EndOfCombatStep:
-				case Main2:
-					if ((item.CardType & Land) && canPlayLand) { nextMove.Add(GetActivePlayer() + ":play:" + i); }
+				case GamePhase.PreCombatStep:
+				case GamePhase.DeclareAttackerStep:
+				case GamePhase.DeclareBlockerStep:
+				case GamePhase.CombatDamageStep:
+				case GamePhase.EndOfCombatStep:
+				case GamePhase.Main2:
+					if (item.CardType.HasFlag(CardType.Land) && canPlayLand) { nextMove.Add(GetActivePlayer() + ":play:" + i); }
 					break;
-				case EndStep:
-				case CleanupStep: break;
-				default:
+				case GamePhase.EndStep:
+				case GamePhase.CleanupStep: break;
+
 				}
 				
 			}
 			nextMove.Add(GetActivePlayer() + ":pass");
-		}
+
+#if DEBUG
+            System.Console.WriteLine("move candidates:");
+            foreach (var nm in nextMove) { System.Console.WriteLine(nm); }
+#endif
+        }
 
 		
 		public int GetActivePlayer() { return turnQueue.First(); }
@@ -83,10 +91,9 @@ namespace FutureSight.lib
 		public void ForwardTurn() { turns++; }
 		public int GetElapsedTurn() { return turns; }
 		
-		private List<int> players;
 		private LinkedList<int> turnQueue;
 		private int turns;
-		private int step;
+		private GamePhase step;
 		private bool canPlayLand;
 
 		private List<string> nextMove;
@@ -99,32 +106,52 @@ namespace FutureSight.lib
 		private bool IsManaCostSatisfied(string cost, Player player)
 		{
 			bool result = false;
-			
-			// calc max mana in manapool
-			int max = player.ManaPool(White) + player.ManaPool(Blue) + player.ManaPool(Black) + player.ManaPool(Red) + player.ManaPool(Green) + player.ManaPool(Colorless);
-			int cmc = 0;
-			MatchCollection mc = Regex.Matches(ManaCost, @"\{(.+)\}");
-			foreach (RegularExpressions.Match m in mc)
+
+            // calc max mana in manapool
+            int max = player.ManaPool.Sum();
+            List<int> costList = new List<int>() { 0, 0, 0, 0, 0, 0, 0 };
+            List<int> tmp = new List<int>(player.ManaPool);
+
+			MatchCollection mc = Regex.Matches(cost, @"\{(.?)\}");
+			foreach (System.Text.RegularExpressions.Match m in mc)
 			{
 				switch (m.Value)
 				{
-				case "W":
-					if (player.ManaPool(White)
-				case "U":
-				case "B":
-				case "R":
-				case "G":
-				case "C":
-					cmc++;
-					break;
-				case "X":
-				case "Y":
-				case "Z":
-					break;
-				default:
+				    case "W": costList[(int)Color.White]++; break;
+				    case "U": costList[(int)Color.Blue]++; break;
+                    case "B": costList[(int)Color.Black]++; break;
+                    case "R": costList[(int)Color.Red]++; break;
+                    case "G": costList[(int)Color.Green]++; break;
+                    case "C": costList[(int)Color.Colorless]++; break;
+                    case "X":
+                    case "Y":
+                    case "Z":
+                        break;
+				    default:
+                        // •s“Á’èƒ}ƒi
+                        costList[(int)Color.Generic] += int.Parse(m.Value);
+                        break;
 				}
 			}
-			return _result;
+
+            tmp[0] = (tmp[0] - costList[0] >= 0) ? tmp[0] - costList[0] : 0;
+            tmp[1] = (tmp[1] - costList[1] >= 0) ? tmp[1] - costList[1] : 0;
+            tmp[2] = (tmp[2] - costList[2] >= 0) ? tmp[2] - costList[2] : 0;
+            tmp[3] = (tmp[3] - costList[3] >= 0) ? tmp[3] - costList[3] : 0;
+            tmp[4] = (tmp[4] - costList[4] >= 0) ? tmp[4] - costList[4] : 0;
+            tmp[5] = (tmp[5] - costList[5] >= 0) ? tmp[5] - costList[5] : 0;
+
+            if (costList[(int)Color.White] <= player.ManaPool[(int)Color.White] &&
+                costList[(int)Color.Blue] <= player.ManaPool[(int)Color.Blue] &&
+                costList[(int)Color.Black] <= player.ManaPool[(int)Color.Black] &&
+                costList[(int)Color.Red] <= player.ManaPool[(int)Color.Red] &&
+                costList[(int)Color.Green] <= player.ManaPool[(int)Color.Green] &&
+                costList[(int)Color.Colorless] <= player.ManaPool[(int)Color.Colorless] &&
+                costList[(int)Color.Generic] <= tmp.Sum())
+            {
+                result = true;
+            }
+			return result;
 		}
 	}
 	

@@ -18,14 +18,8 @@ namespace FutureSight.lib
 			Exile = new List<int>();
 			Library = new List<int>() { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 			Sideboard = new List<int>() { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 };
-			
-			ManaPool = new Dictionary<Color, int>();
-			ManaPool[White] = 0;
-			ManaPool[Blue] = 0;
-			ManaPool[Black] = 0;
-			ManaPool[Red] = 0;
-			ManaPool[Green] = 0;
-			ManaPool[Colorless] = 0;
+
+            ManaPool = new List<int>() { 0, 0, 0, 0, 0, 0 };
 		}
 		
 		public int ID { get; set; }
@@ -35,9 +29,9 @@ namespace FutureSight.lib
 		public List<int> Library { get; set; }
 		public List<int> Sideboard { get; set; }
 
-		public List<Color, int> ManaPool { get; set; }
+		public List<int> ManaPool { get; set; }
 
-/*		public void ShuffleLibrary() {}
+		public void ShuffleLibrary() {}
 		public void DrawCard()
 		{
 			Hand.Add(Library[0]);
@@ -45,5 +39,5 @@ namespace FutureSight.lib
 		}
 		public void PutLand(int no) {}
 		public void CastSpell(int no) {}
-*/	}
+	}
 }

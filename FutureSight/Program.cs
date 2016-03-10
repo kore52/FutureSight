@@ -13,13 +13,11 @@ namespace FutureSight
         static void Main(string[] args)
         {
             CardDB cardDB = new CardDB();
+            cardDB.LoadCardDB();
             Console.WriteLine(cardDB.get(1).Name);
-            GameState aa = new GameState();
-            System.Console.WriteLine(aa.GetElapsedTurn());
 
-            aa.ForwardTurn();
-            GameState bb = (GameState)aa.DeepCopy();
-            System.Console.WriteLine(bb.GetElapsedTurn());
+            GameState root = new GameState();
+            System.Console.WriteLine(root.GetElapsedTurn());
 
             Player p1 = new Player();
             p1.DrawCard();
@@ -27,6 +25,9 @@ namespace FutureSight
             p1.DrawCard();
             string s = p1.Hand.Join();
             System.Console.WriteLine(s);
+            root.Players.Add(p1);
+
+            root.Calc();
 
             Console.ReadKey();
         }

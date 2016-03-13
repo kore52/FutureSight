@@ -7,43 +7,45 @@ using System.Threading.Tasks;
 
 namespace FutureSight.lib
 {
-	enum Color
+	public enum Color
 	{
 		White = 0,
 		Blue,
 		Black,
 		Red,
 		Green,
-		Multicolor,
 		Colorless,
-        Generic
+        Generic,
+        Multicolor
+    }
+
+    [Flags]
+	public enum PermanentType
+	{
+		Artifact = 0x01,
+		Creature = 0x02,
+		Enchantment = 0x04,
+		Land = 0x08,
+		Planeswalker = 0x10
 	}
 
 	[Flags]
-	enum PermanentType
+	public enum CardType
 	{
-		Artifact,
-		Creature,
-		Enchantment,
-		Land,
-		Planeswalker
+		Artifact = 0x01,
+		Creature = 0x02,
+		Enchantment = 0x04,
+		Instant = 0x08,
+		Land = 0x10,
+		Planeswalker = 0x20,
+		Sorcery = 0x40,
+		Tribal = 0x80
 	}
 
-	[Flags]
-	enum CardType
+    [Serializable()]
+    public class Card
 	{
-		Artifact,
-		Creature,
-		Enchantment,
-		Instant,
-		Land,
-		Planeswalker,
-		Sorcery,
-		Tribal
-	}
-   
-	class Card
-	{
+        public Card() { }
 		public Card(string name, string manaCost, string cardType, string subType, string specialType, int power, int toughness, string effects)
 		{
 			this.Name = name;
@@ -100,7 +102,7 @@ namespace FutureSight.lib
 
 	}
 
-	class CardDB
+	public class CardDB
 	{
 		public static CardDB GetInstance()
 		{
@@ -136,4 +138,20 @@ namespace FutureSight.lib
 
 		private static CardDB instance = new CardDB();
 	}
+
+    [Serializable()]
+    public class Permanent : Card
+    {
+        static int Sequencer = 0;
+        public Permanent() { }
+        public Permanent(int cardIndex)
+        {
+            CardIndex = cardIndex;
+            ID = Sequencer;
+            Sequencer++;
+        }
+        public PermanentType PermanentType { get; set; }
+        public int CardIndex { get; set; }
+        public int ID { get; set; }
+    }
 }

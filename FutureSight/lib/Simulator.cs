@@ -20,8 +20,6 @@ namespace FutureSight.lib
 
         public void Calc()
         {
-            var root = new GameState();
-            root.Calc();
         }
 
         public void EnumerateNextMove()

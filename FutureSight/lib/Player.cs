@@ -7,18 +7,24 @@ using System.IO;
 
 namespace FutureSight.lib
 {
-	public class Player
+    [Serializable()]
+    public class Player
 	{
-		public Player()
+        static int Sequencer = 0;
+        public Player()
 		{
-			Random seed = new Random();
-			ID = seed.Next();
+            ID = Sequencer;
+            Sequencer++;
+
 			Hand = new List<int>();
 			Graveyard = new List<int>();
 			Exile = new List<int>();
-			Library = new List<int>() { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+			Library = new List<int>() { 1,1,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 			Sideboard = new List<int>() { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 };
+            Permanents = new List<Permanent>();
 
+            Life = 20;
+            Poison = 0;
             ManaPool = new List<int>() { 0, 0, 0, 0, 0, 0 };
 		}
 		
@@ -28,8 +34,15 @@ namespace FutureSight.lib
 		public List<int> Exile { get; set; }
 		public List<int> Library { get; set; }
 		public List<int> Sideboard { get; set; }
+        public List<Permanent> Permanents { get; set; }
 
+        public int Life { get; set; }
+        public int Poison { get; set; }
 		public List<int> ManaPool { get; set; }
+
+        public bool IsWin { get; set; } = false;
+        public bool IsLose { get; set; } = false;
+        public bool IsEmptyDraw { get; set; } = false;
 
 		public void ShuffleLibrary() {}
 		public void DrawCard()

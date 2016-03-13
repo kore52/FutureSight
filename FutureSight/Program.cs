@@ -16,27 +16,34 @@ namespace FutureSight
             cardDB.LoadCardDB();
             Console.WriteLine(cardDB.get(1).Name);
 
-            GameState root = new GameState();
-            System.Console.WriteLine(root.GetElapsedTurn());
+            GameTree root = new GameTree();
+            root.Data = new GameState();
+            root.Data.Initialize();
+            while(!root.Data.IsGameFinished)
+            {
+                // 手番探索
+                GameState.Calc(root, (int)Depth.Zero);
 
-            Player p1 = new Player();
-            p1.DrawCard();
-            p1.DrawCard();
-            p1.DrawCard();
-            string s = p1.Hand.Join();
-            System.Console.WriteLine(s);
-            root.Players.Add(p1);
+                // 評価値の一番高い手を進める
+                foreach (var move in root.Node)
+                {
+                    if (move.Data.EvalScore == root.Data.EvalScore)
+                    {
+                        root.Data = GameState.DoMove(move.Data.CurrentMove, root.Data);
 
-            root.Calc();
+                        System.Diagnostics.Debug.Print("score:"+root.Data.EvalScore.ToString() + ", move:" + root.Data.CurrentMove);
+                        System.Diagnostics.Debug.Print("move done.");
+                        Console.ReadKey();
 
-            Console.ReadKey();
+                        break;
+                    }
+                }
+
+            }
         }
     }
     public static class Extensions
     {
-        public static string Join(this List<int> list)
-        {
-            return string.Join(",", list.Select(item => item.ToString()).ToArray());
-        }
+        
     }
 }

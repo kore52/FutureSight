@@ -119,7 +119,7 @@ namespace FutureSight.lib
                 GameState stateAfterMove = DoMove(move, parent.Data);
 
                 // 移動後の評価値を計算
-                stateAfterMove.EvalScore = Evaluate.evaluate(parent.Data);
+                stateAfterMove.EvalScore = Evaluate.evaluate(stateAfterMove);
 
                 // 親ノードのスコアを更新
                 parent.Data.EvalScore = Math.Max(parent.Data.EvalScore, stateAfterMove.EvalScore);

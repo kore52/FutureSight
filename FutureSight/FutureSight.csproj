@@ -43,10 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="lib\AI.cs" />
     <Compile Include="lib\Card.cs" />
     <Compile Include="lib\Evaluate.cs" />
     <Compile Include="lib\GameState.cs" />
-    <Compile Include="lib\Player.cs" />
+    <Compile Include="lib\PlayerState.cs" />
     <Compile Include="lib\Simulator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

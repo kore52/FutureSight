@@ -52,16 +52,15 @@ namespace FutureSight.lib
     {
         public GameState()
         {
-            turns = 0;
-            turnQueue = new List<int>() { (int)PLAYER._0, (int)PLAYER._1 };
+            ElapsedTurns = 0;
+            TurnOrder = new List<int>() { (int)PLAYER._0, (int)PLAYER._1 };
             canPlayLand = true;
 
-            Players = new List<Player>();
+            Players = new List<PlayerState>();
             Stack = new LinkedList<string>();
 
-            step = GamePhase.UntapStep;
-            priority = (int)PLAYER._0;
-            EvalScore = 0;
+            Step = GamePhase.UntapStep;
+            Priority = (int)PLAYER._0;
         }
 /*
         public GameState(GameState s)
@@ -76,8 +75,8 @@ namespace FutureSight.lib
         public void Initialize()
         {
             // プレイヤーの読み込み
-            this.Players.Add(new Player());
-            this.Players.Add(new Player());
+            this.Players.Add(new PlayerState());
+            this.Players.Add(new PlayerState());
 
 
             // ライブラリーシャッフル
@@ -117,15 +116,15 @@ namespace FutureSight.lib
             {
                 // 探索した行動ごとに盤面を進める
                 GameState stateAfterMove = DoMove(move, parent.Data);
+                GameTree newTree = new GameTree(stateAfterMove);
 
                 // 移動後の評価値を計算
-                stateAfterMove.EvalScore = Evaluate.evaluate(stateAfterMove);
+                newTree.Score = Evaluate.evaluate(stateAfterMove);
 
                 // 親ノードのスコアを更新
-                parent.Data.EvalScore = Math.Max(parent.Data.EvalScore, stateAfterMove.EvalScore);
+                parent.Score = Math.Max(parent.Score, newTree.Score);
 
-                GameTree newGT = new GameTree(stateAfterMove);
-                parent.Node.Add(newGT);
+                parent.Node.Add(newTree);
 
 #if DEBUG
                 // 木の状態を表示
@@ -134,9 +133,9 @@ namespace FutureSight.lib
                 System.Diagnostics.Debug.Print(String.Format(sp + "Depth{0}->{1}: ActPly:{2}, Pri:{3}, Turn:{4}, Step:{5}",
                     depth, depth + 1,
                     stateAfterMove.GetActivePlayerNumber(), 
-                    stateAfterMove.priority,
-                    (int)stateAfterMove.turns,
-                    (int)stateAfterMove.step));
+                    stateAfterMove.Priority,
+                    (int)stateAfterMove.ElapsedTurns,
+                    (int)stateAfterMove.Step));
 
                 // 盤面の状態を表示
                 System.Diagnostics.Debug.Print(String.Format(sp + "[me:H:{0}, P:{1}], [op:H:{2}, P:{3}]",
@@ -147,7 +146,7 @@ namespace FutureSight.lib
 #endif
 
                 // 子ノードの行動探索
-                Calc(newGT, depth + 1);
+                Calc(newTree, depth + 1);
             }
         }
 
@@ -155,12 +154,12 @@ namespace FutureSight.lib
         {
             var nextMove = new List<Move>();
 
-            Player player = Players[priority];
+            PlayerState player = Players[Priority];
 
             for (int i = 0; i < player.Hand.Count; i++)
             {
                 Card item = CardDB.GetInstance().get(player.Hand[i]);
-                switch (step)
+                switch (Step)
                 {
                     case GamePhase.UntapStep: break;
                     case GamePhase.UpkeepStep:
@@ -208,7 +207,7 @@ namespace FutureSight.lib
                 }
 
             }
-            nextMove.Add(priority + ":none");
+            nextMove.Add(Priority + ":none");
 
 #if DEBUG
             string c = "";
@@ -233,18 +232,18 @@ namespace FutureSight.lib
             {
                 // 優先権をパスし、次のプレイヤーに優先権を渡す
                 case "none":
-                    if (state.turnQueue.Count > state.priority + 1)
+                    if (state.TurnOrder.Count > state.Priority + 1)
                     {
-                        state.priority++;
+                        state.Priority++;
                     } else {
-                        state.priority = state.turnQueue[0];
-                        if (state.step != GamePhase.CleanupStep)
+                        state.Priority = state.TurnOrder[0];
+                        if (state.Step != GamePhase.CleanupStep)
                         {
-                            state.step++;
+                            state.Step++;
                         }
                         else {
-                            state.step = GamePhase.UntapStep;
-                            state.turns++;
+                            state.Step = GamePhase.UntapStep;
+                            state.ElapsedTurns++;
                         }
                     }
                     break;
@@ -272,7 +271,7 @@ namespace FutureSight.lib
         {
             foreach (var p in state.Players)
             {
-                switch(state.step)
+                switch(state.Step)
                 {
                     case GamePhase.UntapStep: break;
                     case GamePhase.DrawStep: break;
@@ -312,19 +311,23 @@ namespace FutureSight.lib
         }
 
         // misc
-        public int GetActivePlayerNumber() { return turnQueue.First(); }
-        public Player GetActivePlayer() { return Players[turnQueue.First()]; }
+        public int GetActivePlayerNumber() { return TurnOrder.First(); }
+        public PlayerState GetActivePlayer() { return Players[TurnOrder.First()]; }
 
-        public List<Player> Players { get; set; }
+        public List<PlayerState> Players { get; set; }
         public LinkedList<string> Stack { get; set; }
 
-        public void ForwardTurn() { turns++; }
-        public int GetElapsedTurn() { return turns; }
+        public void ForwardTurn() { ElapsedTurns++; }
+        public int GetElapsedTurn() { return ElapsedTurns; }
 
-        public int EvalScore { get; set; }
+        public int Priority { get; set; }
+        public GamePhase Step { get; set; }
+        public int ElapsedTurns { get; set; }
+
         public Move CurrentMove { get; set; }
         public bool IsGameFinished { get { return isGameFinished; } }
 
+        public List<int> TurnOrder { get; set; }
 
 
 
@@ -332,10 +335,7 @@ namespace FutureSight.lib
 
 
         // 内部
-        private int priority;
-        private List<int> turnQueue;
-        private int turns;
-        private GamePhase step;
+
         private bool canPlayLand;
         private bool isGameFinished;
 
@@ -346,7 +346,7 @@ namespace FutureSight.lib
             return false;
         }
 
-        private bool IsManaCostSatisfied(string cost, Player player)
+        private bool IsManaCostSatisfied(string cost, PlayerState player)
         {
             bool result = false;
 
@@ -469,5 +469,6 @@ namespace FutureSight.lib
         }
         public List<GameTree> Node { get; set; }
         public GameState Data { get; set; }
+        public int Score { get; set; }
     }
 }

@@ -8,10 +8,10 @@ using System.IO;
 namespace FutureSight.lib
 {
     [Serializable()]
-    public class Player
+    public class PlayerState
 	{
         static int Sequencer = 0;
-        public Player()
+        public PlayerState()
 		{
             ID = Sequencer;
             Sequencer++;
@@ -28,23 +28,26 @@ namespace FutureSight.lib
             ManaPool = new List<int>() { 0, 0, 0, 0, 0, 0 };
 		}
 		
-		public int ID { get; set; }
-		public List<int> Hand { get; set; }
-		public List<int> Graveyard { get; set; }
-		public List<int> Exile { get; set; }
-		public List<int> Library { get; set; }
-		public List<int> Sideboard { get; set; }
-        public List<Permanent> Permanents { get; set; }
 
+        public int ID { get; set; }
         public int Life { get; set; }
         public int Poison { get; set; }
-		public List<int> ManaPool { get; set; }
 
         public bool IsWin { get; set; } = false;
         public bool IsLose { get; set; } = false;
         public bool IsEmptyDraw { get; set; } = false;
+        public bool CanPlayLand { get; set; } = false;
 
-		public void ShuffleLibrary() {}
+        // —Ìˆæ
+        public List<int> ManaPool { get; set; }
+        public List<int> Hand { get; set; }
+        public List<int> Graveyard { get; set; }
+        public List<int> Exile { get; set; }
+        public List<int> Library { get; set; }
+        public List<int> Sideboard { get; set; }
+        public List<Permanent> Permanents { get; set; }
+
+        public void ShuffleLibrary() {}
 		public void DrawCard()
 		{
 			Hand.Add(Library[0]);

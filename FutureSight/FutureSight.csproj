@@ -44,9 +44,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="lib\AI.cs" />
+    <Compile Include="lib\AI2.cs" />
     <Compile Include="lib\Card.cs" />
     <Compile Include="lib\Evaluate.cs" />
     <Compile Include="lib\GameState.cs" />
+    <Compile Include="lib\MTGEvent.cs" />
+    <Compile Include="lib\MTGPhase.cs" />
     <Compile Include="lib\PlayerState.cs" />
     <Compile Include="lib\Simulator.cs" />
     <Compile Include="Program.cs" />

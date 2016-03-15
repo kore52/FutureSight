@@ -27,165 +27,165 @@ namespace FutureSight.lib
     
     public class MTGPhase
     {
-        public string ToString() { return step; }
-        protected virtual void Execute(GameState game) { }
-        protected virtual string step = "";
+        protected void ExecutePhase(GameState game) { }
+        public string Step { get { return step; } }
+        protected string step;
     }
     
     // ステップ固有処理
-    public class MTGUntapStep : public MTGPhase
+    public class MTGUntapStep : MTGPhase
     {
         private static MTGPhase instance;
         
         public MTGPhase GetInstance() { return instance ?? new MTGUntapStep(); }
         
-        public void ExecutePhase(GameState game)
+        public new void ExecutePhase(GameState game)
         {
         }
         
-        private string step = "Untap";
+        private new string step = "Untap";
     }
     
-    public class MTGUpkeepStep : public MTGPhase
+    public class MTGUpkeepStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGUpkeepStep(); }
+        MTGPhase GetInstance() { return instance ?? new MTGUpkeepStep(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "Upkeep";
+        private new string step = "Upkeep";
     }
     
-    public class MTGDrawStep : public MTGPhase
+    public class MTGDrawStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGDrawStep(); }
+        MTGPhase GetInstance() { return instance ?? new MTGDrawStep(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "Draw";
+        private new string step = "Draw";
     }
 
-    public class MTGFirstMainPhase : public MTGPhase
+    public class MTGFirstMainPhase : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGFirstMainPhase(); }
+        MTGPhase GetInstance() { return instance ?? new MTGFirstMainPhase(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "FirstMain";
+        private new string step = "FirstMain";
     }
 
-    public class MTGPreCombatStep : public MTGPhase
+    public class MTGPreCombatStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGPreCombatStep(); }
+        MTGPhase GetInstance() { return instance ?? new MTGPreCombatStep(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "PreCombat";
+        private new string step = "PreCombat";
     }
 
-    public class MTGDeclareAttackerStep : public MTGPhase
+    public class MTGDeclareAttackerStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGDeclareAttackerStep(); }
+        MTGPhase GetInstance() { return instance ?? new MTGDeclareAttackerStep(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "DeclareAttacker";
+        private new string step = "DeclareAttacker";
     }
 
-    public class MTGDeclareBlockerStep : public MTGPhase
+    public class MTGDeclareBlockerStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGDeclareBlockerStep(); }
+        MTGPhase GetInstance() { return instance ?? new MTGDeclareBlockerStep(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "DeclareBlocker";
+        private new string step = "DeclareBlocker";
     }
 
-    public class MTGDamageStep : public MTGPhase
+    public class MTGDamageStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGDamageStep(); }
+        MTGPhase GetInstance() { return instance ?? new MTGDamageStep(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "Damage";
+        private new string step = "Damage";
     }
 
-    public class MTGEndCombatStep : public MTGPhase
+    public class MTGEndCombatStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGEndCombatStep(); }
+        MTGPhase GetInstance() { return instance ?? new MTGEndCombatStep(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "EndCombat";
+        private new string step = "EndCombat";
     }
 
-    public class MTGSecondMainPhase : public MTGPhase
+    public class MTGSecondMainPhase : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGSecondMainPhase(); }
+        MTGPhase GetInstance() { return instance ?? new MTGSecondMainPhase(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "SecondMain";
+        private new string step = "SecondMain";
     }
 
-    public class MTGEndStep : public MTGPhase
+    public class MTGEndStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGEndStep(); }
+        MTGPhase GetInstance() { return instance ?? new MTGEndStep(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "End";
+        private new string step = "End";
     }
 
-    public class MTGCleanupStep : public MTGPhase
+    public class MTGCleanupStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGCleanupStep(); }
+        MTGPhase GetInstance() { return instance ?? new MTGCleanupStep(); }
         
         public void ExecuteStep(GameState game)
         {
         }
         
-        private string step = "Cleanup";
+        private new string step = "Cleanup";
     }
 }

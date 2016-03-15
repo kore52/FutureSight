@@ -24,14 +24,16 @@ namespace FutureSight.lib
         Input : GameState
         Output : Move, GameState
     */
-    public class AI
+    public class AI2
     {
         public MTGChoice FindNextChoice(GameState state)
         {
-            if 
+            GameState copiedGame = (GameState)Utilities.DeepCopy(state);
+
             return null;
         }
         
+
         /*
         public static void Calculate(GameTree tree, int depth)
         {

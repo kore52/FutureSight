@@ -329,7 +329,8 @@ namespace FutureSight.lib
 
         public List<int> TurnOrder { get; set; }
 
-
+        private LinkedList<MTGEvent> eventQueue;
+        public MTGEvent GetNextEvent() { return eventQueue.First.Value; }
 
 
 

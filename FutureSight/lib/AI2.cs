@@ -28,8 +28,20 @@ namespace FutureSight.lib
     {
         public MTGChoice FindNextChoice(GameState state)
         {
-            GameState copiedGame = (GameState)Utilities.DeepCopy(state);
+            MTGEvent events = state.GetNextEvent();
 
+            // search choices related by next event
+            foreach (var choice in events.GetChoices())
+            {
+                GameState copiedGame = (GameState)Utilities.DeepCopy(state);
+                
+                {
+                    copiedGame.DoMove(choice, DepthZero, MaxDepth);
+                
+                    // eval score
+                    EvaluateGame(copiedGame);
+                }
+            }
             return null;
         }
         

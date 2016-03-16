@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace FutureSight.lib
 {
-    enum MTGPhaseType
+    public enum MTGPhaseType
     {
         Untap,
         Upkeep,
@@ -37,7 +37,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? new MTGUntapStep(); }
+        public MTGPhase GetInstance() { return instance ?? (instance = new MTGUntapStep()); }
         
         public new void ExecutePhase(GameState game)
         {
@@ -50,7 +50,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGUpkeepStep(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGUpkeepStep()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -63,7 +63,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGDrawStep(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGDrawStep()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -76,7 +76,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGFirstMainPhase(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGFirstMainPhase()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -89,7 +89,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGPreCombatStep(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGPreCombatStep()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -102,7 +102,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGDeclareAttackerStep(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGDeclareAttackerStep()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -115,7 +115,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGDeclareBlockerStep(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGDeclareBlockerStep()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -128,7 +128,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGDamageStep(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGDamageStep()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -141,7 +141,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGEndCombatStep(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGEndCombatStep()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -154,7 +154,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGSecondMainPhase(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGSecondMainPhase()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -167,7 +167,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGEndStep(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGEndStep()); }
         
         public void ExecuteStep(GameState game)
         {
@@ -180,7 +180,7 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? new MTGCleanupStep(); }
+        MTGPhase GetInstance() { return instance ?? (instance = new MTGCleanupStep()); }
         
         public void ExecuteStep(GameState game)
         {

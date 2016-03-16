@@ -11,7 +11,15 @@ namespace FutureSight.lib
 {
     public class MTGEvent
     {
-        public MTGEvent() { }
+        delegate void MTGEventHandler(GameState state, PlayerState player);
+    }
+    
+    public class MTGDrawEvent : MTGEvent
+    {
+        public void Execute(GameState state, PlayerState player)
+        {
+            player.Draw();
+        }
     }
     
     public class MTGChoice

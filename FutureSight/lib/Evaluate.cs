@@ -22,7 +22,7 @@ namespace FutureSight.lib
         {
             int score = 0;
 
-            foreach (PlayerState player in state.Players)
+            foreach (MTGPlayer player in state.Players)
             {
                 if (player.ID == state.GetActivePlayer().ID)
                 {

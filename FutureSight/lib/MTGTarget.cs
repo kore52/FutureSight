@@ -9,19 +9,20 @@ using System.Security.Cryptography;
 
 namespace FutureSight.lib
 {
-    public class MTGTarget
+    public abstract class MTGTarget
     {
+        public MTGTarget() { }
         public MTGTarget(string type)
         {
             targetType = type;
         }
-        
-        public Object[] GetLegalTargets(Object[] targets)
+
+        public List<MTGTarget> GetLegalTargets(GameState game)
         {
-            return new Object[];
+            return new List<MTGTarget>();
         }
 
-        public string TargetType { get { return targetType; } };
+        public string TargetType { get { return targetType; } }
 
         protected string targetType;
     }
@@ -29,26 +30,26 @@ namespace FutureSight.lib
     public class MTGNoneTarget : MTGTarget
     {
         public MTGNoneTarget() : base("none") {}
-        
-        public Object[] new GetLegalTargets(Object[] targets)
-        {
-            return new Object[];
-        }
     }
     
     public class MTGPlayerTarget : MTGTarget
     {
         public MTGPlayerTarget() : base("MTGPlayerTarget") {}
-        
-        public Object[] new GetLegalTargets(Object[] targets)
+
+        public new List<MTGTarget> GetLegalTargets(GameState game)
         {
-            var results = new List<PlayerState>();
-            if (typeof(targets).Name != TargetType) { return new Object[]; }
-            foreach(var player in targets)
+            var results = new List<MTGTarget>();
+            foreach(var player in game.Players)
             {
                 results.Add(player);
             }
             return results;
         }
+    }
+
+    public class MTGPermanentTarget : MTGTarget
+    {
+        public MTGPermanentTarget() : base("MTGPlayerTarget") { }
+
     }
 }

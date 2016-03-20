@@ -45,13 +45,18 @@
   <ItemGroup>
     <Compile Include="lib\AI.cs" />
     <Compile Include="lib\AI2.cs" />
-    <Compile Include="lib\Card.cs" />
+    <Compile Include="lib\MTGCardInfoLoader.cs" />
+    <Compile Include="lib\MTGCard.cs" />
+    <Compile Include="lib\Definitions.cs" />
     <Compile Include="lib\Evaluate.cs" />
     <Compile Include="lib\GameState.cs" />
+    <Compile Include="lib\MTGAction.cs" />
     <Compile Include="lib\MTGEvent.cs" />
+    <Compile Include="lib\MTGPermanent.cs" />
     <Compile Include="lib\MTGPhase.cs" />
+    <Compile Include="lib\MTGTarget.cs" />
     <Compile Include="lib\MurmurHash.cs" />
-    <Compile Include="lib\PlayerState.cs" />
+    <Compile Include="lib\MTGPlayer.cs" />
     <Compile Include="lib\Simulator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

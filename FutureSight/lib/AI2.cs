@@ -26,7 +26,7 @@ namespace FutureSight.lib
     */
     public class AI2
     {
-        public MTGChoice FindNextChoice(GameState state)
+        public MTGChoice FindNextChoiceResults(GameState state)
         {
             MTGEvent events = state.GetNextEvent();
 
@@ -226,7 +226,7 @@ namespace FutureSight.lib
         }
 
         // マナコストを満たしているかチェック
-        private static bool IsManaCostSatisfied(string cost, PlayerState player)
+        private static bool IsManaCostSatisfied(string cost, MTGPlayer player)
         {
             bool result = false;
 

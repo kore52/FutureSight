@@ -9,38 +9,17 @@ using System.Security.Cryptography;
 
 namespace FutureSight.lib
 {
-        /*
-        Element for event
-        
-        spell or ability
-         mode
-          choice : 1, 2
-           target
-            targettype = {
-             none, player, object, zone,
-             1, 2, 1 or more, 3 or less, etc...
-            }
-            choice
-           cost
-            costtype: mana, tap, loyalty, scrifice, paylife, alternative, additional, variable, etc...
-             choice
-            choice
-          effect
-           list of event
-            event
-             eventtype: etb, pig, exile, put onto top of library, etc...
-                        look, draw, discard, tap, untap, add mana, pay mana, deal damage, prevent damage,
-                        put any counters onto
-                        divide any pile
-                        copy
-                        cast
-             choice
-        */
-    interface abstract class MTGEvent
+    public class MTGEvent
     {
+        public static readonly object[] NO_CHOICE_RESULTS = new object[0];
+
+        public MTGPlayer Player { get; set; }
+        public MTGChoice Choice { get; set; }
+        public MTGTarget Target { get; set; }
+        public MTGAction Action { get; set; }
     }
     
-    interface abstract class MTGCost
+    interface MTGCost
     {
     }
     
@@ -56,6 +35,6 @@ namespace FutureSight.lib
     
     public class MTGCardChoice : MTGChoice
     {
-        public List<Card> GetResults(GameState state, MTGEvent event)
+        public List<MTGCard> GetResults(GameState state, MTGEvent event)
     }
 }

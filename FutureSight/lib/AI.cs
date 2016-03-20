@@ -77,11 +77,11 @@ namespace FutureSight.lib
         {
             var nextMove = new List<Move>();
 
-            PlayerState player = state.Players[state.Priority];
+            MTGPlayer player = state.Players[state.Priority];
 
             for (int i = 0; i < player.Hand.Count; i++)
             {
-                Card item = CardDB.GetInstance().get(player.Hand[i]);
+                MTGCard item = CardDB.GetInstance().get(player.Hand[i]);
                 switch (state.Step)
                 {
                     case GamePhase.UntapStep: break;
@@ -196,7 +196,7 @@ namespace FutureSight.lib
         }
 
         // マナコストを満たしているかチェック
-        private static bool IsManaCostSatisfied(string cost, PlayerState player)
+        private static bool IsManaCostSatisfied(string cost, MTGPlayer player)
         {
             bool result = false;
 

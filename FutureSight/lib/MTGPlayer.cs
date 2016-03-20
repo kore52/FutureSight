@@ -8,20 +8,20 @@ using System.IO;
 namespace FutureSight.lib
 {
     [Serializable()]
-    public class PlayerState
+    public class MTGPlayer : MTGTarget
 	{
         static int Sequencer = 0;
-        public PlayerState()
+        public MTGPlayer()
 		{
             ID = Sequencer;
             Sequencer++;
 
-			Hand = new List<int>();
-			Graveyard = new List<int>();
-			Exile = new List<int>();
-			Library = new List<int>() { 1,1,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-			Sideboard = new List<int>() { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 };
-            Permanents = new List<Permanent>();
+			Hand = new List<MTGCard>();
+			Graveyard = new List<MTGCard>();
+			Exile = new List<MTGCard>();
+            Library = new List<MTGCard>();
+            Sideboard = new List<MTGCard>();
+            Permanents = new List<MTGPermanent>();
 
             Life = 20;
             Poison = 0;
@@ -38,14 +38,17 @@ namespace FutureSight.lib
         public bool IsEmptyDraw { get; set; } = false;
         public bool CanPlayLand { get; set; } = false;
 
+        public bool HasAbility(MTGAbilityType type) { return ability.HasFlag(type);  }
+
         // 領域
+        public List<MTGCard> Hand { get; set; }
+        public List<MTGCard> Graveyard { get; set; }
+        public List<MTGCard> Exile { get; set; }
+        public List<MTGCard> Library { get; set; }
+        public List<MTGCard> Sideboard { get; set; }
+        public List<MTGPermanent> Permanents { get; set; }
+
         public List<int> ManaPool { get; set; }
-        public List<int> Hand { get; set; }
-        public List<int> Graveyard { get; set; }
-        public List<int> Exile { get; set; }
-        public List<int> Library { get; set; }
-        public List<int> Sideboard { get; set; }
-        public List<Permanent> Permanents { get; set; }
 
         public void ShuffleLibrary() {}
 		public void DrawCard()
@@ -55,5 +58,10 @@ namespace FutureSight.lib
 		}
 		public void PutLand(int no) {}
 		public void CastSpell(int no) {}
+
+        // 内部
+
+        // プレイヤーが持つ能力
+        private MTGAbilityType ability;
 	}
 }

@@ -56,7 +56,7 @@ namespace FutureSight.lib
             TurnOrder = new List<int>() { (int)PLAYER._0, (int)PLAYER._1 };
             canPlayLand = true;
 
-            Players = new List<PlayerState>();
+            Players = new List<MTGPlayer>();
             Stack = new LinkedList<string>();
 
             Step = GamePhase.UntapStep;
@@ -75,8 +75,8 @@ namespace FutureSight.lib
         public void Initialize()
         {
             // プレイヤーの読み込み
-            this.Players.Add(new PlayerState());
-            this.Players.Add(new PlayerState());
+            this.Players.Add(new MTGPlayer());
+            this.Players.Add(new MTGPlayer());
 
 
             // ライブラリーシャッフル
@@ -154,11 +154,11 @@ namespace FutureSight.lib
         {
             var nextMove = new List<Move>();
 
-            PlayerState player = Players[Priority];
+            MTGPlayer player = Players[Priority];
 
             for (int i = 0; i < player.Hand.Count; i++)
             {
-                Card item = CardDB.GetInstance().get(player.Hand[i]);
+                MTGCard item = CardDB.GetInstance().get(player.Hand[i]);
                 switch (Step)
                 {
                     case GamePhase.UntapStep: break;
@@ -312,9 +312,9 @@ namespace FutureSight.lib
 
         // misc
         public int GetActivePlayerNumber() { return TurnOrder.First(); }
-        public PlayerState GetActivePlayer() { return Players[TurnOrder.First()]; }
+        public MTGPlayer GetActivePlayer() { return Players[TurnOrder.First()]; }
 
-        public List<PlayerState> Players { get; set; }
+        public List<MTGPlayer> Players { get; set; }
         public LinkedList<string> Stack { get; set; }
 
         public void ForwardTurn() { ElapsedTurns++; }
@@ -347,7 +347,7 @@ namespace FutureSight.lib
             return false;
         }
 
-        private bool IsManaCostSatisfied(string cost, PlayerState player)
+        private bool IsManaCostSatisfied(string cost, MTGPlayer player)
         {
             bool result = false;
 

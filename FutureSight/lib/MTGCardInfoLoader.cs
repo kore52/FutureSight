@@ -10,6 +10,10 @@ namespace FutureSight.lib
     {
         public static MTGCardInfoLoader GetInstance()
         {
+            if (instance == null)
+            {
+                instance = new MTGCardInfoLoader();
+            }
             return instance;
         }
 
@@ -26,30 +30,27 @@ namespace FutureSight.lib
             };
         }
 
-        public void ReadFromFile(string DBFileName)
+        public void ReadFromCSVFile(string fileName)
         {
-            // format
-            // Card Name
-            // Mana Cost
-            // Card Type
-            // Special Type
-            // Sub Type
-            // Power
-            // Toughness
-            // Ability
-            // Color Indicator
-            // Loyalty
             try
             {
-                using (var stream = new System.IO.StreamReader(DBFileName))
+                var fileStream = new System.IO.FileStream("CardInfo.csv");
+                var streamReader = new System.IO.StreamReader(streamReader);
+                var csvReader = new CsvReader(streamReader);
+                csvReader.Configuration.HasHeaderRecord = true; // Default Value.
+                csvReader.Configuration.RegisterClassMap<CardInfoFields>(); 
+                while (csvReader.Read())
                 {
-                    while (!stream.EndOfStream)
-                    {
-                    }
+                    var rec = stream.GetRecord<CardInfoFields>();
+                    int hash = MurmurHash(rec.CardName + rec.Expansion + rec.CollectorNumber);
+                    database.Add(hash, new MTGCard());
                 }
             }
             catch (System.Exception e)
             {
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine(e.Message);
+#endif
             }
         }
 
@@ -66,8 +67,37 @@ namespace FutureSight.lib
             }
         }
 
+        private Dictionary<string, MTGCard> database;
         private Dictionary<int, MTGCard> cardDB;
 
-        private static CardDB instance = new CardDB();
+        private static MTGCardInfoLoader instance;
+    }
+        
+    public sealed class CardInfoFields : CsvClassMap<CardInfoFields>
+    {
+        public CardInfoFields()
+        {
+            Map(m => m.CardName);
+            Map(m => m.ManaCost);
+            Map(m => m.CardType);
+            Map(m => m.SpecialType);
+            Map(m => m.SubType);
+            Map(m => m.Power);
+            Map(m => m.Toughness);
+            Map(m => m.Ability);
+            Map(m => m.ColorIndicator);
+            Map(m => m.Loyalty);
+            Map(m => m.Expansion);
+            Map(m => m.CollectorNumber);
+            Map(m => m.Illustrator);
+            Map(m => m.FlavorText);
+            Map(m => m.IllustURI);
+            Map(m => m.Flippable);
+            Map(m => m.RefFlip);
+            Map(m => m.Transformable);
+            Map(m => m.RefTransform);
+            Map(m => m.Splittable);
+            Map(m => m.RefSplit);
+        }
     }
 }

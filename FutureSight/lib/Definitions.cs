@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace FutureSight.lib
 {
+    [Flags]
     public enum Color
     {
-        White = 0,
-        Blue,
-        Black,
-        Red,
-        Green,
-        Colorless,
-        Multicolor
+        Colorless   = 0x00,
+        White       = 0x01,
+        Blue        = 0x02,
+        Black       = 0x04,
+        Red         = 0x08,
+        Green       = 0x10,
     }
 
     public enum ManaSymbol
@@ -74,40 +74,36 @@ namespace FutureSight.lib
         Null
     }
 
-    public static class ColorPicker
-    {
-    }
-
     [Flags]
     public enum PermanentType
     {
-        Unknown = 0,
-        Artifact = 0x01,
-        Creature = 0x02,
-        Enchantment = 0x04,
-        Land = 0x08,
+        Unknown      = 0x00,
+        Artifact     = 0x01,
+        Creature     = 0x02,
+        Enchantment  = 0x04,
+        Land         = 0x08,
         Planeswalker = 0x10,
     }
 
     [Flags]
     public enum CardType
     {
-        Unknown = 0,
-        Artifact = 0x01,
-        Creature = 0x02,
-        Enchantment = 0x04,
-        Instant = 0x08,
-        Land = 0x10,
+        Unknown      = 0,
+        Artifact     = 0x01,
+        Creature     = 0x02,
+        Enchantment  = 0x04,
+        Instant      = 0x08,
+        Land         = 0x10,
         Planeswalker = 0x11,
-        Sorcery = 0x12,
-        Tribal = 0x14,
+        Sorcery      = 0x12,
+        Tribal       = 0x14,
 
         // 以下は多分使わない
-        Conspiracy = 0x18,
-        Phenomenon = 0x20,
-        Plane = 0x21,
-        Scheme = 0x22,
-        Vanguard = 0x24,
+        Conspiracy   = 0x18,
+        Phenomenon   = 0x20,
+        Plane        = 0x21,
+        Scheme       = 0x22,
+        Vanguard     = 0x24,
     }
 
     [Flags]
@@ -179,7 +175,7 @@ namespace FutureSight.lib
         Vraska,
         Xenagos,
 
-        // sub type of instannt and sorcery
+        // sub type of instant and sorcery
         Arcane,
         Trap,
 
@@ -498,5 +494,39 @@ namespace FutureSight.lib
 
             return result;
         }
+    }
+    
+    public class MTGSubTypeSet
+    {
+        public MTGSubTypeSet() { subTypeList = new List<MTGSubType>(); }
+        public MTGSubTypeSet(string type) { subTypeList = type.GetSubTypeList(); }
+        public MTGSubTypeSet(List<MTGSubType> list) { subTypeList = new List<MTGSubType>(list); }
+        public void Add(MTGSubType type) { subTypeList.Add(type); }
+        public void Remove(MTGSubType type) { subTypeList.Remove(type); }
+        public void Empty() { subTypeList.Empty(); }
+        
+        public Get { get { return subTypeList; } }
+
+        private List<MTGSubType> subTypeList;
+    }
+
+    public class MTGSpecialTypeSet
+    {
+        public MTGSpecialTypeSet()
+        { SpecialTypeList = new List<MTGSpecialType>(); }
+        
+        public MTGSpecialTypeSet(string type)
+        { specialTypeList = type.GetSpecialTypeList(); }
+        
+        public MTGSpecialTypeSet(List<MTGSpecialType> list)
+        { specialTypeList = list; }
+        
+        public void Add(MTGSpecialType type) { specialTypeList.Add(type); }
+        public void Remove(MTGSpecialType type) { specialTypeList.Remove(type); }
+        public void Empty() { SpecialTypeList.Empty(); }
+        
+        public Get { get { return SpecialTypeList; } }
+
+        private List<MTGSpecialType> specialTypeList;
     }
 }

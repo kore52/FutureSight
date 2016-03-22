@@ -15,6 +15,11 @@ Set up to run as a LinqPad (linqpad.net) script (thus the ".Dump()" call)
         //Change to suit your needs
         const uint seed = 144;
 
+        public static int Hash(string stringStream)
+        {
+            return Hash(new MemoryStream(Encoding.Unicode.GetBytes(stringStream)));
+        }
+        
         public static int Hash(Stream stream)
         {
             const uint c1 = 0xcc9e2d51;

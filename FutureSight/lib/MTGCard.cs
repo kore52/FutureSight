@@ -30,13 +30,38 @@ namespace FutureSight.lib
             this.Toughness = toughness;
             this.Effects = effects;
         }
+        
+        public MTGCard(
+            string              cardName,
+            string              manaCost,
+            CardType            cardType,
+            MTGSpecialTypeSet   specialType,
+            MTGSubTypeSet       subType,
+            string              power,
+            string              toughness,
+            List<string>        ablitity,
+            Color               ColorIndicator,
+            string              loyalty,
+            string              expansion,
+            string              collectorNumber,
+            string              illustrator,
+            string              flavorText,
+            string              illustURI,
+            string              flippable,
+            string              refFlippedCardName,
+            string              transformable,
+            string              refTransformedCardName,
+            string              splittable,
+            string              refSplittedCardName,
+        )
+        {}
 
         // properties
         public string Name { get; set; }
         public string ManaCost { get; set; }
         public CardType CardType { get; set; }
-        public List<MTGSubType> SubType { get; set; }
         public List<MTGSpecialType> SpecialType { get; set; }
+        public List<MTGSubType> SubType { get; set; }
         public int Power { get; set; }
         public int Toughness { get; set; }
         public string Effects { get; set; }

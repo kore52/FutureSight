@@ -52,7 +52,7 @@ namespace FutureSight.lib
             string              transformable,
             string              refTransformedCardName,
             string              splittable,
-            string              refSplittedCardName,
+            string              refSplittedCardName
         )
         {}
 
@@ -95,7 +95,32 @@ namespace FutureSight.lib
         }
     }
 
-    
 
-    
+    [Serializable()]
+    public class MTGCardDefiniton
+    {
+        public string cardName;
+        public string manaCost;
+        public CardType cardType;
+        public MTGSpecialTypeSet specialType;
+        public MTGSubTypeSet subType;
+        public string power;
+        public string toughness;
+        public List<string> ablitity;
+        public Color ColorIndicator;
+        public string loyalty;
+        public string expansion;
+        public string collectorNumber;
+        public string illustrator;
+        public string flavorText;
+        public string illustURI;
+        public string flippable;
+        public string refFlippedCardName;
+        public string transformable;
+        public string refTransformedCardName;
+        public string splittable;
+        public string refSplittedCardName;
+
+    }
+
 }

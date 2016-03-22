@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace FutureSight.lib
 {
@@ -34,15 +37,15 @@ namespace FutureSight.lib
         {
             try
             {
-                var fileStream = new System.IO.FileStream("CardInfo.csv");
-                var streamReader = new System.IO.StreamReader(streamReader);
+                var fileStream = new System.IO.FileStream("CardInfo.csv", FileMode.Open);
+                var streamReader = new System.IO.StreamReader(fileStream);
                 var csvReader = new CsvReader(streamReader);
                 csvReader.Configuration.HasHeaderRecord = true; // Default Value.
                 csvReader.Configuration.RegisterClassMap<CardInfoFields>(); 
                 while (csvReader.Read())
                 {
-                    var rec = stream.GetRecord<CardInfoFields>();
-                    int hash = MurmurHash(rec.CardName + rec.Expansion + rec.CollectorNumber);
+                    var rec = csvReader.GetRecord<CardInfoFields>();
+                    int hash = MurMurHash3.Hash(rec.CardName + rec.Expansion + rec.CollectorNumber);
                     database.Add(hash, new MTGCard());
                 }
             }
@@ -67,12 +70,12 @@ namespace FutureSight.lib
             }
         }
 
-        private Dictionary<string, MTGCard> database;
+        private Dictionary<int, MTGCard> database;
         private Dictionary<int, MTGCard> cardDB;
 
         private static MTGCardInfoLoader instance;
     }
-        
+
     public sealed class CardInfoFields : CsvClassMap<CardInfoFields>
     {
         public CardInfoFields()
@@ -99,5 +102,27 @@ namespace FutureSight.lib
             Map(m => m.Splittable);
             Map(m => m.RefSplit);
         }
+
+        public string CardName { get; set; }
+        public string ManaCost { get; set; }
+        public string CardType { get; set; }
+        public string SpecialType { get; set; }
+        public string SubType { get; set; }
+        public string Power { get; set; }
+        public string Toughness { get; set; }
+        public string Ability { get; set; }
+        public string ColorIndicator { get; set; }
+        public string Loyalty { get; set; }
+        public string Expansion { get; set; }
+        public string CollectorNumber { get; set; }
+        public string Illustrator { get; set; }
+        public string FlavorText { get; set; }
+        public string IllustURI { get; set; }
+        public string Flippable { get; set; }
+        public string RefFlip { get; set; }
+        public string Transformable { get; set; }
+        public string RefTransform { get; set; }
+        public string Splittable { get; set; }
+        public string RefSplit { get; set; }
     }
 }

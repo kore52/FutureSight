@@ -41,10 +41,10 @@ namespace FutureSight.lib
                 var streamReader = new System.IO.StreamReader(fileStream);
                 var csvReader = new CsvReader(streamReader);
                 csvReader.Configuration.HasHeaderRecord = true; // Default Value.
-                csvReader.Configuration.RegisterClassMap<CardInfoFields>(); 
+                csvReader.Configuration.RegisterClassMap<CardDefinitionMap>(); 
                 while (csvReader.Read())
                 {
-                    var rec = csvReader.GetRecord<CardInfoFields>();
+                    var rec = csvReader.GetRecord<CardDefinitionMap>();
                     int hash = MurMurHash3.Hash(rec.CardName + rec.Expansion + rec.CollectorNumber);
                     database.Add(hash, new MTGCard());
                 }
@@ -76,53 +76,31 @@ namespace FutureSight.lib
         private static MTGCardInfoLoader instance;
     }
 
-    public sealed class CardInfoFields : CsvClassMap<CardInfoFields>
+    public sealed class CardDefinitionMap : CsvClassMap<MTGCardDefiniton>
     {
-        public CardInfoFields()
+        public CardDefinitionMap()
         {
-            Map(m => m.CardName);
-            Map(m => m.ManaCost);
-            Map(m => m.CardType);
-            Map(m => m.SpecialType);
-            Map(m => m.SubType);
-            Map(m => m.Power);
-            Map(m => m.Toughness);
-            Map(m => m.Ability);
-            Map(m => m.ColorIndicator);
-            Map(m => m.Loyalty);
-            Map(m => m.Expansion);
-            Map(m => m.CollectorNumber);
-            Map(m => m.Illustrator);
-            Map(m => m.FlavorText);
-            Map(m => m.IllustURI);
-            Map(m => m.Flippable);
-            Map(m => m.RefFlip);
-            Map(m => m.Transformable);
-            Map(m => m.RefTransform);
-            Map(m => m.Splittable);
-            Map(m => m.RefSplit);
+            Map(m => m.cardName);
+            Map(m => m.manaCost);
+            Map(m => m.cardType);
+            Map(m => m.specialType);
+            Map(m => m.subType);
+            Map(m => m.power);
+            Map(m => m.toughness);
+            Map(m => m.ability);
+            Map(m => m.colorIndicator);
+            Map(m => m.loyalty);
+            Map(m => m.expansion);
+            Map(m => m.collectorNumber);
+            Map(m => m.illustrator);
+            Map(m => m.flavorText);
+            Map(m => m.illustURI);
+            Map(m => m.flippable);
+            Map(m => m.refFlip);
+            Map(m => m.transformable);
+            Map(m => m.refTransform);
+            Map(m => m.splittable);
+            Map(m => m.refSplit);
         }
-
-        public string CardName { get; set; }
-        public string ManaCost { get; set; }
-        public string CardType { get; set; }
-        public string SpecialType { get; set; }
-        public string SubType { get; set; }
-        public string Power { get; set; }
-        public string Toughness { get; set; }
-        public string Ability { get; set; }
-        public string ColorIndicator { get; set; }
-        public string Loyalty { get; set; }
-        public string Expansion { get; set; }
-        public string CollectorNumber { get; set; }
-        public string Illustrator { get; set; }
-        public string FlavorText { get; set; }
-        public string IllustURI { get; set; }
-        public string Flippable { get; set; }
-        public string RefFlip { get; set; }
-        public string Transformable { get; set; }
-        public string RefTransform { get; set; }
-        public string Splittable { get; set; }
-        public string RefSplit { get; set; }
     }
 }

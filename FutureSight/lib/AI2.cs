@@ -6,45 +6,56 @@ using System.Text.RegularExpressions;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Security.Cryptography;
+using System.Diagnostics.Stopwatch;
 
 using Move = System.String;
 
-/*
-plyr,zone_id,object_id,(cast|play|activate),
-plyr,zone_id,object_id,activate,ab_id,[trgt_id,...]
-plyr,effect_id,
-plyr,attack,[attk_creature:(plyr|pw)][,...]
-plyr,block,[blck_creature:(attk_creature)][,...]
-plyr,blckdet,[attk_creature|
-*/
-
 namespace FutureSight.lib
 {
-    /*
-        Input : GameState
-        Output : Move, GameState
-    */
+    public class AIScore
+    {
+        public int score { get; set; }
+        public int depth { get; set; }
+    }
+    
     public class AI2
     {
-        public MTGChoice FindNextChoiceResults(GameState state)
+        public AI2()
         {
-            MTGEvent events = state.GetNextEvent();
-
+            stopWatch = new StopWatch();
+        }
+        
+        public MTGChoice FindNextEventChoiceResults(GameState game)
+        {
+            MTGEvent ev = game.GetNextEvent();
+            
             // search choices related by next event
-            foreach (var choice in events.GetChoices())
+            foreach (var choice in ev.GetChoices())
             {
-                GameState copiedGame = (GameState)Utilities.DeepCopy(state);
+                GameState copiedGame = (GameState)Utilities.DeepCopy(game);
                 
+                // TODO : multi threading
                 {
-                    copiedGame.DoMove(choice, DepthZero, MaxDepth);
+                    stopWatch.StartNew();
+                    var score = RunGame(choice, DepthZero, 5000);
                 
-                    // eval score
-                    EvaluateGame(copiedGame);
+                    // record score
+                    var gameId = 
                 }
             }
             return null;
         }
         
+        public AIScore RunGame(object choice, int depth, int maxTime)
+        {
+            var aScore = new AIScore();
+            if (maxTime < stopWatch.ElapsedMilliseconds) {
+                aScore.score = 
+                return score;
+            }
+            var score = RunGame(choice, depth + 1, maxTime);
+            return score;
+        }
 
         /*
         public static void Calculate(GameTree tree, int depth)
@@ -97,74 +108,6 @@ namespace FutureSight.lib
                 Calculate(newTree, depth + 1);
             }*/
         }
-        
-        // 全行動パターンを試す
-/*        public static List<Move> Search(GameState state)
-        {
-            var nextMove = new List<Move>();
-
-            PlayerState player = state.Players[state.Priority];
-
-            for (int i = 0; i < player.Hand.Count; i++)
-            {
-                Card item = CardDB.GetInstance().get(player.Hand[i]);
-                switch (state.Step)
-                {
-                    case GamePhase.UntapStep: break;
-                    case GamePhase.UpkeepStep:
-                    case GamePhase.DrawStep:
-                        if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                        break;
-                    case GamePhase.Main1:
-                        if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-
-                        if (player.ID == state.GetActivePlayer().ID)
-                        {
-                            if (item.CardType.HasFlag(CardType.Land) && player.CanPlayLand) { nextMove.Add(state.GetActivePlayerNumber() + ":play:" + i); }
-                            if (item.CardType.HasFlag(CardType.Creature) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Sorcery) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Enchantment) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Artifact) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Planeswalker) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                        }
-                        break;
-                    case GamePhase.PreCombatStep:
-                    case GamePhase.DeclareAttackerStep:
-                    case GamePhase.DeclareBlockerStep:
-                    case GamePhase.CombatDamageStep:
-                    case GamePhase.EndOfCombatStep:
-                        if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                        break;
-                    case GamePhase.Main2:
-                        if (item.CardType.HasFlag(CardType.Land) && player.CanPlayLand) { nextMove.Add(state.GetActivePlayerNumber() + ":play:" + i); }
-
-                        if (player.ID == state.GetActivePlayer().ID)
-                        {
-                            if (item.CardType.HasFlag(CardType.Creature) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Sorcery) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Enchantment) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Artifact) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Planeswalker) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                        }
-                        break;
-                    case GamePhase.EndStep:
-                        if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(state.GetActivePlayerNumber() + ":cast:" + i); }
-                        break;
-                    case GamePhase.CleanupStep: break;
-
-                }
-
-            }
-            nextMove.Add(state.Priority + ":none");
-
-#if DEBUG
-            string c = "";
-            foreach (var nm in nextMove) { c += "[" + nm + "]"; }
-            System.Diagnostics.Debug.Print(c);
-#endif
-            return nextMove;
-        }*/
         
         // Search all possible moves
         private static List<GameState> Search(GameState sourceGame)
@@ -279,6 +222,25 @@ namespace FutureSight.lib
             }
             return result;
         }
+        
+        private StopWatch stopWatch;
+        private Dictionary<int, GameState> scoreBoard;
+    }
+    
+    public class AIWorker
+    {
+        private int id;
+        private GameState game;
+        private Dictionary<int, GameState> scoreBoard;
+        
+        public AIWorker(int id, GameState game, Dictionary<int, GameState> scoreBoard)
+        {
+            this.id = id;
+            this.game = game;
+            this.scoreBoard = scoreBoard;
+        }
+        
+        public AIScore RunGame
     }
 }
 

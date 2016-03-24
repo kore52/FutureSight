@@ -54,7 +54,6 @@ namespace FutureSight.lib
         {
             ElapsedTurns = 0;
             TurnOrder = new List<int>() { (int)PLAYER._0, (int)PLAYER._1 };
-            canPlayLand = true;
 
             Players = new List<MTGPlayer>();
             Stack = new LinkedList<string>();

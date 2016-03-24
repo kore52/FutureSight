@@ -9,16 +9,16 @@ namespace FutureSight.lib
 {
     [Serializable()]
     public class MTGPlayer : MTGTarget
-	{
+    {
         static int Sequencer = 0;
         public MTGPlayer()
-		{
+        {
             ID = Sequencer;
             Sequencer++;
 
-			Hand = new List<MTGCard>();
-			Graveyard = new List<MTGCard>();
-			Exile = new List<MTGCard>();
+            Hand = new List<MTGCard>();
+            Graveyard = new List<MTGCard>();
+            Exile = new List<MTGCard>();
             Library = new List<MTGCard>();
             Sideboard = new List<MTGCard>();
             Permanents = new List<MTGPermanent>();
@@ -26,42 +26,48 @@ namespace FutureSight.lib
             Life = 20;
             Poison = 0;
             ManaPool = new List<int>() { 0, 0, 0, 0, 0, 0 };
-		}
-		
+        }
 
-        public int ID { get; set; }
-        public int Life { get; set; }
-        public int Poison { get; set; }
+        public string Name { get; private set; }
+        public int ID { get; private set; }
+        public int Life { get; private set; }
+        public int Poison { get; private set; }
 
-        public bool IsWin { get; set; } = false;
-        public bool IsLose { get; set; } = false;
-        public bool IsEmptyDraw { get; set; } = false;
-        public bool CanPlayLand { get; set; } = false;
+        public bool IsWin { get; private set; } = false;
+        public bool IsLose { get; private set; } = false;
+        public bool IsEmptyDraw { get; private set; } = false;
+
+        public bool CanPlayLand { get { return (maxPlayableLand > countPlayedLand) ? true : false; } }
+        private int maxPlayableLand = 1;
+        private int countPlayedLand = 0;
 
         public bool HasAbility(MTGAbilityType type) { return ability.HasFlag(type);  }
 
-        // 領域
-        public List<MTGCard> Hand { get; set; }
-        public List<MTGCard> Graveyard { get; set; }
-        public List<MTGCard> Exile { get; set; }
-        public List<MTGCard> Library { get; set; }
-        public List<MTGCard> Sideboard { get; set; }
-        public List<MTGPermanent> Permanents { get; set; }
+        // 手札
+        public List<MTGCard> Hand { get; private set; }
+        
+        // 墓地
+        public List<MTGCard> Graveyard; { get; private set; }
+        
+        // 追放領域
+        public List<MTGCard> Exile; { get; private set; }
+        
+        // ライブラリー
+        public List<MTGCard> Library; { get; private set; }
+        
+        // サイドボード
+        public List<MTGCard> Sideboard; { get; private set; }
+        
+        // コントロールしているパーマネント
+        public List<MTGPermanent> Permanents; { get; private set; }
 
-        public List<int> ManaPool { get; set; }
+        // マナプール
+        public List<int> ManaPool; { get; private set; }
 
-        public void ShuffleLibrary() {}
-		public void DrawCard()
-		{
-			Hand.Add(Library[0]);
-			Library.Remove(Library[0]);
-		}
-		public void PutLand(int no) {}
-		public void CastSpell(int no) {}
+        // 対戦相手
+        public List<MTGPlayer> Opponents { get; } }
 
-        // 内部
-
-        // プレイヤーが持つ能力
+        // プレイヤーが持つ効果
         private MTGAbilityType ability;
-	}
+    }
 }

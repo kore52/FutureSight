@@ -13,10 +13,10 @@ namespace FutureSight.lib
     {
         public static readonly object[] NO_CHOICE_RESULTS = new object[0];
 
-        public MTGPlayer Player { get; set; }
-        public MTGChoice Choice { get; set; }
-        public MTGTarget Target { get; set; }
-        public MTGAction Action { get; set; }
+        public MTGPlayer Player { get; private set; }
+        public MTGChoice Choice { get; private set; }
+        public MTGTarget Target { get; private set; }
+        public MTGAction Action { get; private set; }
     }
     
     interface MTGCost
@@ -35,6 +35,6 @@ namespace FutureSight.lib
     
     public class MTGCardChoice : MTGChoice
     {
-        public List<MTGCard> GetResults(GameState state, MTGEvent event)
+        public List<MTGCard> GetResults(GameState state, MTGEvent aEvent)
     }
 }

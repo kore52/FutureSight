@@ -10,25 +10,36 @@ namespace FutureSight.lib
     [Serializable()]
     public class MTGPermanent
     {
+        public PermanentType PermanentType { get; set; }
+        public int ID { get; }
+        private MTGCard card;
+
+        public string                           Name { get { return card.Name; } }
+        public PermanentType                    Type { get { return card.CardType.GetPermanentType(); } }
+        public List<MTGSubType>                 SubType { get; set; }
+        public List<MTGSpecialType>             SpecialType { get; set; }
+        public MTGPlayer                        Owner { get { return card.Owner; } set { card.Owner = Owner; } }
+        public MTGPlayer                        Controller { get; set; }
+        public int                              Power { get; set; }
+        public int                              Toughness { get; set; }
+        public Dictionary<MTGCounterType, int>  Counters;
+        public int                              Score { get; set; }
+
         public MTGPermanent()
         {
             card = new MTGCard();
             ID = generateId(card);
+            Power = 0;
+            Toughness = 0;
+            Counters = new Dictionary<MTGCounterType, int>();
+            Score = 0;
         }
 
-        public MTGPermanent(MTGCard fromCard)
+        public MTGPermanent(MTGCard fromCard) : this()
         {
             card = fromCard;
             ID = generateId(card);
         }
-
-        public PermanentType PermanentType { get; set; }
-        public int ID { get; }
-
-        public string           Name { get { return card.Name; } }
-        public PermanentType    Type { get { return card.CardType.GetPermanentType(); } }
-        public List<MTGSubType> SubType { get { return card.SubType; } }
-        public List<MTGSpecialType> SpecialType { get { return card.SpecialType; } }
 
         /// パーマネントID生成
         private int generateId(MTGCard card)
@@ -38,6 +49,54 @@ namespace FutureSight.lib
             return id;
         }
 
-        private MTGCard card;
+        /// <summary>
+        /// パーマネントの状態起因チェック
+        /// </summary>
+        public void GenerateStateBasedActions()
+        {
+            var game = Owner.CurrentGame;
+            if (IsCreature())
+            {
+                if (Toughness <= 0)
+                {
+                    game.AddDelayedAction(new RemoveFromBattleField(this, LocationType.Graveyard));
+                }
+            }
+        }
+        
+        public bool IsArtifact()
+        {
+            return PermanentType.HasFlag(PermanentType.Artifact);
+        }
+
+        public bool IsCreature()
+        {
+            return PermanentType.HasFlag(PermanentType.Creature);
+        }
+
+        public bool IsEnchantment()
+        {
+            return PermanentType.HasFlag(PermanentType.Enchantment);
+        }
+        
+        public bool IsPlaneswalker()
+        {
+            return PermanentType.HasFlag(PermanentType.Planeswalker);
+        }
+
+        public bool HasSubType(MTGSubType subType)
+        {
+            return SubType.Contains(subType);
+        }
+
+        public bool IsEquipment()
+        {
+            return IsArtifact() && HasSubType(MTGSubType.Equipment);
+        }
+
+        public bool IsAura()
+        {
+            return IsEnchantment() && HasSubType(MTGSubType.Aura);
+        }
     }
 }

@@ -9,12 +9,12 @@ namespace FutureSight.lib
     [Flags]
     public enum Color
     {
-        Colorless   = 0x00,
-        White       = 0x01,
-        Blue        = 0x02,
-        Black       = 0x04,
-        Red         = 0x08,
-        Green       = 0x10,
+        Colorless = 0x00,
+        White = 0x01,
+        Blue = 0x02,
+        Black = 0x04,
+        Red = 0x08,
+        Green = 0x10,
     }
 
     public enum ManaSymbol
@@ -74,36 +74,46 @@ namespace FutureSight.lib
         Null
     }
 
+    public enum LocationType
+    {
+        Command,
+        Hand,
+        Exile,
+        Battlefield,
+        Graveyard,
+        Library,
+    }
+
     [Flags]
     public enum PermanentType
     {
-        Unknown      = 0x00,
-        Artifact     = 0x01,
-        Creature     = 0x02,
-        Enchantment  = 0x04,
-        Land         = 0x08,
+        Unknown = 0x00,
+        Artifact = 0x01,
+        Creature = 0x02,
+        Enchantment = 0x04,
+        Land = 0x08,
         Planeswalker = 0x10,
     }
 
     [Flags]
     public enum CardType
     {
-        Unknown      = 0,
-        Artifact     = 0x01,
-        Creature     = 0x02,
-        Enchantment  = 0x04,
-        Instant      = 0x08,
-        Land         = 0x10,
+        Unknown = 0,
+        Artifact = 0x01,
+        Creature = 0x02,
+        Enchantment = 0x04,
+        Instant = 0x08,
+        Land = 0x10,
         Planeswalker = 0x11,
-        Sorcery      = 0x12,
-        Tribal       = 0x14,
+        Sorcery = 0x12,
+        Tribal = 0x14,
 
         // 以下は多分使わない
-        Conspiracy   = 0x18,
-        Phenomenon   = 0x20,
-        Plane        = 0x21,
-        Scheme       = 0x22,
-        Vanguard     = 0x24,
+        Conspiracy = 0x18,
+        Phenomenon = 0x20,
+        Plane = 0x21,
+        Scheme = 0x22,
+        Vanguard = 0x24,
     }
 
     [Flags]
@@ -433,6 +443,136 @@ namespace FutureSight.lib
         World,
     }
 
+    public enum MTGCounterType
+    {
+        Plus1_Plus1,
+        Plus1_Plus0,
+        Plus1_Plus2,
+        Plus0_Plus1,
+        Plus0_Plus2,
+        Plus2_Plus0,
+        Plus2_Plus2,
+
+        Minus1_Minus1,
+        Minus1_Minus0,
+        Minus0_Minus1,
+        Minus0_Minus2,
+        Minus2_Minus1,
+
+        Age,
+        Aim,
+        Arrow,
+        Arrowhead,
+        Awakening,
+        Blaze,
+        Blood,
+        Bounty,
+        Bribery,
+        Carrion,
+        Charge,
+        Chip,
+        Corpse,
+        Credit,
+        Crystal,
+        Cube,
+        Currency,
+        Death,
+        Delay,
+        Depletion,
+        Despair,
+        Devotion,
+        Divinity,
+        Doom,
+        Dream,
+        Echo,
+        Elixir,
+        Energy,
+        Eon,
+        Experience,
+        Eyeball,
+        Fade,
+        Fate,
+        Feather,
+        Filibuster,
+        Flame,
+        Flood,
+        Fungus,
+        Funk,
+        Fuse,
+        Gem,
+        Glyph,
+        Gold,
+        Growth,
+        Hatchling,
+        Healing,
+        Hoofprint,
+        Hourglass,
+        Hunger,
+        Husk,
+        Ice,
+        Infection,
+        Intervention,
+        Isolation,
+        Javelin,
+        Ki,
+        Level,
+        Lore,
+        Loyalty,
+        Luck,
+        Magnet,
+        Manifestation,
+        Mannequin,
+        Matrix,
+        Mine,
+        Mining,
+        Mire,
+        Muster,
+        Net,
+        Omen,
+        Ore,
+        Page,
+        Pain,
+        Paralyzation,
+        Petal,
+        Petrification,
+        Phylactery,
+        Pin,
+        Plague,
+        Poison,
+        Polyp,
+        Pressure,
+        Pupa,
+        Quest,
+        Rust,
+        Scream,
+        Scroll,
+        Shell,
+        Shield,
+        Shred,
+        Sleep,
+        Sleight,
+        Slime,
+        Soot,
+        Spore,
+        Storage,
+        Strife,
+        Study,
+        Theft,
+        Tide,
+        Time,
+        Tower,
+        Training,
+        Trap,
+        Treasure,
+        Velocity,
+        Verse,
+        Vitality,
+        Wage,
+        Winch,
+        Wind,
+        Wish,
+    }
+
     public static class EnumTypeHelper
     {
         public static PermanentType GetPermanentType(this CardType ct)
@@ -458,19 +598,19 @@ namespace FutureSight.lib
             List<MTGSubType> result = new List<MTGSubType>();
             try
             {
-                foreach(var type in stringTypeList.Split(' '))
+                foreach (var type in stringTypeList.Split(' '))
                 {
                     result.Add((MTGSubType)Enum.Parse(typeof(MTGSubType), type));
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 result.Add(MTGSubType.None);
 #if DEBUG
                 System.Diagnostics.Debug.Print(e.Message);
 #endif
             }
-            
+
             return result;
         }
 
@@ -495,38 +635,30 @@ namespace FutureSight.lib
             return result;
         }
     }
-    
+
     public class MTGSubTypeSet
     {
+        private List<MTGSubType> subTypeList;
+
         public MTGSubTypeSet() { subTypeList = new List<MTGSubType>(); }
         public MTGSubTypeSet(string type) { subTypeList = type.GetSubTypeList(); }
         public MTGSubTypeSet(List<MTGSubType> list) { subTypeList = new List<MTGSubType>(list); }
         public void Add(MTGSubType type) { subTypeList.Add(type); }
         public void Remove(MTGSubType type) { subTypeList.Remove(type); }
-        public void Empty() { subTypeList.Empty(); }
-        
-        public Get { get { return subTypeList; } }
-
-        private List<MTGSubType> subTypeList;
+        public void Clear() { subTypeList.Clear(); }
+        public List<MTGSubType> Get { get { return subTypeList; } }
     }
 
     public class MTGSpecialTypeSet
     {
-        public MTGSpecialTypeSet()
-        { SpecialTypeList = new List<MTGSpecialType>(); }
-        
-        public MTGSpecialTypeSet(string type)
-        { specialTypeList = type.GetSpecialTypeList(); }
-        
-        public MTGSpecialTypeSet(List<MTGSpecialType> list)
-        { specialTypeList = list; }
-        
+        private List<MTGSpecialType> specialTypeList;
+
+        public MTGSpecialTypeSet() { specialTypeList = new List<MTGSpecialType>(); }
+        public MTGSpecialTypeSet(string type) { specialTypeList = type.GetSpecialTypeList(); }        
+        public MTGSpecialTypeSet(List<MTGSpecialType> list) { specialTypeList = list; }
         public void Add(MTGSpecialType type) { specialTypeList.Add(type); }
         public void Remove(MTGSpecialType type) { specialTypeList.Remove(type); }
-        public void Empty() { SpecialTypeList.Empty(); }
-        
-        public Get { get { return SpecialTypeList; } }
-
-        private List<MTGSpecialType> specialTypeList;
+        public void Clear() { specialTypeList.Clear(); }
+        public List<MTGSpecialType> Get { get { return specialTypeList; } }
     }
 }

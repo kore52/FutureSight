@@ -9,6 +9,15 @@ using System.Security.Cryptography;
 
 namespace FutureSight.lib
 {
+    public enum MTGStep
+    {
+        Begin,
+        ActivePlayer,
+        OtherPlayer,
+        Resolve,
+        NextPhase,
+    }
+
     public enum MTGPhaseType
     {
         Untap,
@@ -27,9 +36,33 @@ namespace FutureSight.lib
     
     public class MTGPhase
     {
-        protected void ExecutePhase(GameState game) { }
         public string Step { get { return step; } }
         protected string step;
+
+        public void ExecuteBeginPhase(GameState game) { }
+
+        public void ExecutePhase(GameState game)
+        {
+            switch (game.Step)
+            {
+                case MTGStep.Begin:
+                    // ステップ固有処理の実行
+                    ExecuteBeginPhase(game);
+                    game.Update();
+                    break;
+                case MTGStep.ActivePlayer:
+                    // 状況起因処理の実行
+                    game.CheckStatePutTriggers();
+
+                    break;
+                case MTGStep.OtherPlayer:
+                    break;
+                case MTGStep.Resolve:
+                    break;
+                case MTGStep.NextPhase:
+                    break;
+            }
+        }
     }
     
     // ステップ固有処理
@@ -39,7 +72,7 @@ namespace FutureSight.lib
         
         public MTGPhase GetInstance() { return instance ?? (instance = new MTGUntapStep()); }
         
-        public new void ExecutePhase(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -52,7 +85,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGUpkeepStep()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -65,7 +98,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGDrawStep()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -78,7 +111,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGFirstMainPhase()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -91,7 +124,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGPreCombatStep()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -104,7 +137,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGDeclareAttackerStep()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -117,7 +150,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGDeclareBlockerStep()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -130,7 +163,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGDamageStep()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -143,7 +176,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGEndCombatStep()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -156,7 +189,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGSecondMainPhase()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -169,7 +202,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGEndStep()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         
@@ -182,7 +215,7 @@ namespace FutureSight.lib
         
         MTGPhase GetInstance() { return instance ?? (instance = new MTGCleanupStep()); }
         
-        public void ExecuteStep(GameState game)
+        public new void ExecuteBeginPhase(GameState game)
         {
         }
         

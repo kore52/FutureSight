@@ -56,7 +56,7 @@ namespace FutureSight.lib
                     depth, depth + 1,
                     stateAfterMove.GetActivePlayerNumber(),
                     stateAfterMove.Priority,
-                    (int)stateAfterMove.ElapsedTurns,
+                    (int)stateAfterMove.Turn,
                     (int)stateAfterMove.Step));
 
                 // ”Õ–Ê‚Ìó‘Ô‚ğ•\¦
@@ -172,7 +172,7 @@ namespace FutureSight.lib
                         }
                         else {
                             state.Step = GamePhase.UntapStep;
-                            state.ElapsedTurns++;
+                            state.Turn++;
                         }
                     }
                     break;

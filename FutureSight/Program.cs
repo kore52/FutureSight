@@ -19,7 +19,7 @@ namespace FutureSight
             GameTree root = new GameTree();
             root.Data = new GameState();
             root.Data.Initialize();
-            while(!root.Data.IsGameFinished)
+            while(!root.Data.IsFinished)
             {
                 // 手番探索
                 GameState.Calc(root, (int)Depth.Zero);

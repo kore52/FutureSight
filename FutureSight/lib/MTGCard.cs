@@ -10,6 +10,11 @@ namespace FutureSight.lib
     [Serializable()]
     public class MTGCard
     {
+        public MTGCardDefiniton Definition { get; set; }
+        public string Name { get { return Definition.cardName; } set { Definition.cardName = Name; } }
+        public CardType CardType { get { return Definition.cardType; } set { Definition.cardType = CardType; } }
+        public MTGPlayer Owner { get; set; }
+
         public MTGCard() { }
         public MTGCard(string name, string manaCost, string cardType, string subType, string specialType, int power, int toughness, string effects)
         {
@@ -24,48 +29,21 @@ namespace FutureSight.lib
             if (cardType.Contains("Sorcery")) { this.CardType |= CardType.Sorcery; }
             if (cardType.Contains("Tribal")) { this.CardType |= CardType.Tribal; }
 
-            this.SubType = subType.GetSubTypeList();
-            this.SpecialType = specialType.GetSpecialTypeList();
-            this.Power = power;
-            this.Toughness = toughness;
-            this.Effects = effects;
+            Definition.subType = subType.GetSubTypeList();
+            Definition.specialType = specialType.GetSpecialTypeList();
+            Definition.power = power;
+            Definition.toughness = toughness;
+            
         }
         
         public MTGCard(
-            string              cardName,
-            string              manaCost,
-            CardType            cardType,
-            MTGSpecialTypeSet   specialType,
-            MTGSubTypeSet       subType,
-            string              power,
-            string              toughness,
-            List<string>        ablitity,
-            Color               ColorIndicator,
-            string              loyalty,
-            string              expansion,
-            string              collectorNumber,
-            string              illustrator,
-            string              flavorText,
-            string              illustURI,
-            string              flippable,
-            string              refFlippedCardName,
-            string              transformable,
-            string              refTransformedCardName,
-            string              splittable,
-            string              refSplittedCardName
+            MTGCardDefiniton definition,
+            MTGPlayer owner
         )
-        {}
-
-        // properties
-        public string Name { get; set; }
-        public string ManaCost { get; set; }
-        public CardType CardType { get; set; }
-        public List<MTGSpecialType> SpecialType { get; set; }
-        public List<MTGSubType> SubType { get; set; }
-        public int Power { get; set; }
-        public int Toughness { get; set; }
-        public string Effects { get; set; }
-        public string Descriptions { get; set; }
+        {
+            Definition = definition;
+            Owner = owner;
+        }
 
         public int ConvertedManaCost() {
             int cmc = 0;

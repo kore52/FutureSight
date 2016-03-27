@@ -1,11 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-using System.Security.Cryptography;
 
 using Move = System.String;
 
@@ -50,27 +45,49 @@ namespace FutureSight.lib
     [Serializable()]
     public class GameState
     {
+        public List<MTGPlayer> Players { get; set; }
+        public LinkedList<string> Stack { get; set; }
+        public int Priority { get; set; }
+        public MTGPhase Phase { get; set; }
+        public MTGStep Step { get; set; }
+        public int Turn { get; set; }
+        public Move CurrentMove { get; set; }
+        private LinkedList<MTGAction> actions;
+        private LinkedList<MTGAction> delayedActions;
+        public LinkedList<MTGEvent> Events { get; set; }
+        
+        public bool IsFinished { get { return false; } }
+        public List<int> TurnOrder { get; set; }
+        public MTGEvent GetNextEvent() { return eventQueue.First.Value; }
+        public int Score { get; set; }
+        public long ID
+        {
+            get
+            {
+                long id = 0;
+                id += Turn * 1000000000000;
+                id += (long)Step * 1000000000;
+                id += Players.Sum(p => p.ID);
+                return id;
+            }
+        }
+        public List<GameState> MoveNode { get; set; }
+
+        private MTGPlayer scorePlayer;
+        public MTGPlayer TurnPlayer { get; set; }
+        private LinkedList<MTGEvent> eventQueue;
+
         public GameState()
         {
-            ElapsedTurns = 0;
+            Turn = 0;
             TurnOrder = new List<int>() { (int)PLAYER._0, (int)PLAYER._1 };
 
             Players = new List<MTGPlayer>();
             Stack = new LinkedList<string>();
 
-            Step = GamePhase.UntapStep;
             Priority = (int)PLAYER._0;
         }
-/*
-        public GameState(GameState s)
-        {
-            this.turns = s.turns;
-            this.turnQueue = new List<int>(s.turnQueue);
-            this.canPlayLand = s.canPlayLand;
 
-            this.Players = new List<Player>(s.Players);
-        }
-        */
         public void Initialize()
         {
             // プレイヤーの読み込み
@@ -100,354 +117,130 @@ namespace FutureSight.lib
 #endif
         }
 
-        public static void Calc(GameTree parent, int depth)
+
+        // misc
+        public int GetActivePlayerNumber()
         {
-            if (depth > (int)Depth.Max) { return; }
-
-            if (parent == null)
-            {
-                parent = new GameTree();
-            }
-
-            // 優先権を持っているプレイヤーの次の行動の候補を探索
-            var moveCandidates = parent.Data.Search();
-            foreach (var move in moveCandidates)
-            {
-                // 探索した行動ごとに盤面を進める
-                GameState stateAfterMove = DoMove(move, parent.Data);
-                GameTree newTree = new GameTree(stateAfterMove);
-
-                // 移動後の評価値を計算
-                newTree.Score = Evaluate.evaluate(stateAfterMove);
-
-                // 親ノードのスコアを更新
-                parent.Score = Math.Max(parent.Score, newTree.Score);
-
-                parent.Node.Add(newTree);
-
-#if DEBUG
-                // 木の状態を表示
-                string sp = "";
-                for (int c=0; c <depth; c++) { sp += " "; }
-                System.Diagnostics.Debug.Print(String.Format(sp + "Depth{0}->{1}: ActPly:{2}, Pri:{3}, Turn:{4}, Step:{5}",
-                    depth, depth + 1,
-                    stateAfterMove.GetActivePlayerNumber(), 
-                    stateAfterMove.Priority,
-                    (int)stateAfterMove.ElapsedTurns,
-                    (int)stateAfterMove.Step));
-
-                // 盤面の状態を表示
-                System.Diagnostics.Debug.Print(String.Format(sp + "[me:H:{0}, P:{1}], [op:H:{2}, P:{3}]",
-                    Utilities.Join(stateAfterMove.Players[0].Hand),
-                    String.Join(",", stateAfterMove.Players[0].Permanents.Select(item => item.ID).ToArray()),
-                    Utilities.Join(stateAfterMove.Players[1].Hand),
-                    String.Join(",", stateAfterMove.Players[1].Permanents.Select(item => item.ID).ToArray())));
-#endif
-
-                // 子ノードの行動探索
-                Calc(newTree, depth + 1);
-            }
+            return TurnOrder.First();
         }
 
-        public List<Move> Search()
+        public MTGPlayer GetActivePlayer()
         {
-            var nextMove = new List<Move>();
-
-            MTGPlayer player = Players[Priority];
-
-            for (int i = 0; i < player.Hand.Count; i++)
-            {
-                MTGCard item = CardDB.GetInstance().get(player.Hand[i]);
-                switch (Step)
-                {
-                    case GamePhase.UntapStep: break;
-                    case GamePhase.UpkeepStep:
-                    case GamePhase.DrawStep:
-                        if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                        break;
-                    case GamePhase.Main1:
-                        if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-
-                        if (player.ID == GetActivePlayer().ID)
-                        {
-                            if (item.CardType.HasFlag(CardType.Land) && canPlayLand) { nextMove.Add(GetActivePlayerNumber() + ":play:" + i); }
-                            if (item.CardType.HasFlag(CardType.Creature) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Sorcery) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Enchantment) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Artifact) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Planeswalker) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                        }
-                        break;
-                    case GamePhase.PreCombatStep:
-                    case GamePhase.DeclareAttackerStep:
-                    case GamePhase.DeclareBlockerStep:
-                    case GamePhase.CombatDamageStep:
-                    case GamePhase.EndOfCombatStep:
-                        if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                        break;
-                    case GamePhase.Main2:
-                        if (item.CardType.HasFlag(CardType.Land) && canPlayLand) { nextMove.Add(GetActivePlayerNumber() + ":play:" + i); }
-
-                        if (player.ID == GetActivePlayer().ID)
-                        {
-                            if (item.CardType.HasFlag(CardType.Creature) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Sorcery) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Enchantment) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Artifact) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                            if (item.CardType.HasFlag(CardType.Planeswalker) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                        }
-                        break;
-                    case GamePhase.EndStep:
-                        if (item.CardType.HasFlag(CardType.Instant) && IsManaCostSatisfied(item.ManaCost, player)) { nextMove.Add(GetActivePlayerNumber() + ":cast:" + i); }
-                        break;
-                    case GamePhase.CleanupStep: break;
-
-                }
-
-            }
-            nextMove.Add(Priority + ":none");
-
-#if DEBUG
-            string c = "";
-            foreach (var nm in nextMove) { c += "[" + nm + "]"; }
-            System.Diagnostics.Debug.Print(c);
-#endif
-            return nextMove;
+            return Players[TurnOrder.First()];
         }
 
-        // 1手進めた盤面を返す
-        public static GameState DoMove(Move move, GameState previousState)
+
+        public void ForwardTurn()
         {
-            // 盤面情報のコピー
-            GameState state = (GameState)previousState.DeepCopy();
-
-            string[] moveElement = move.Split(':');
-            int indexOfPlayer = int.Parse(moveElement[0]);
-
-            // ターン起因処理
-            
-            switch (moveElement[1])
-            {
-                // 優先権をパスし、次のプレイヤーに優先権を渡す
-                case "none":
-                    if (state.TurnOrder.Count > state.Priority + 1)
-                    {
-                        state.Priority++;
-                    } else {
-                        state.Priority = state.TurnOrder[0];
-                        if (state.Step != GamePhase.CleanupStep)
-                        {
-                            state.Step++;
-                        }
-                        else {
-                            state.Step = GamePhase.UntapStep;
-                            state.ElapsedTurns++;
-                        }
-                    }
-                    break;
-
-                // 土地のプレイ
-                case "play":
-                    int indexOfHand = int.Parse(moveElement[2]);
-                    // パーマネントに登録し、手札から除外する
-                    int hid = state.Players[indexOfPlayer].Hand[indexOfHand];
-                    state.Players[indexOfPlayer].Permanents.Add(new Permanent(indexOfHand));
-                    state.Players[indexOfPlayer].Hand.RemoveAt(hid);
-                    break;
-            }
-
-            // 行った動作を保存
-            state.CurrentMove = move;
-            CheckStateBasedAction(state);
-
-
-            return state;
+            Turn++;
         }
 
-        // ターン起因処理
-        public static void TurnBasedAction(GameState state)
+
+        // ゲームの状態を更新する
+        public void Update()
         {
-            foreach (var p in state.Players)
-            {
-                switch(state.Step)
-                {
-                    case GamePhase.UntapStep: break;
-                    case GamePhase.DrawStep: break;
-                    case GamePhase.DeclareAttackerStep: break;
-                    case GamePhase.DeclareBlockerStep: break;
-                    case GamePhase.CombatDamageStep: break;
-                    case GamePhase.CleanupStep: break;
-                    default: break;
-                }
-            }
+            DoDelayedAction();
+
         }
 
         // 状況起因処理
-        public static void CheckStateBasedAction(GameState state)
+        public bool IsStateCheckRequired { get; set; }
+        public void CheckStatePutTriggers()
         {
-            foreach (var p in state.Players)
+            // チェックの必要がなくなるまで繰り返す
+            while (IsStateCheckRequired)
             {
-                // ライフが0以下のプレイヤーはゲームに敗北する
-                if (p.Life <= 0) { p.IsLose = true; }
+                IsStateCheckRequired = false;
 
-                // 毒カウンターが10個以上のプレイヤーはゲームに敗北する
-                if (p.Poison >= 10) { p.IsLose = true; }
-
-                // ライブラリーが空の状態でドローしたプレイヤーはゲームに敗北する
-                if (p.IsEmptyDraw) { p.IsLose = true; }
-            }
-
-
-            // ゲームの終了判定
-            //   ・1人以上が勝利する
-            int cntWin = state.Players.Where(p => p.IsWin == true).Count();
-            if (cntWin > 0) { state.isGameFinished = true; return; }
-
-            //   ・1人を残してその他全員が敗北する
-            int cntLose = state.Players.Where(p => p.IsLose == true).Count();
-            if (cntLose == state.Players.Count - 1) { state.isGameFinished = true; return; }
-        }
-
-        // misc
-        public int GetActivePlayerNumber() { return TurnOrder.First(); }
-        public MTGPlayer GetActivePlayer() { return Players[TurnOrder.First()]; }
-
-        public List<MTGPlayer> Players { get; set; }
-        public LinkedList<string> Stack { get; set; }
-
-        public void ForwardTurn() { ElapsedTurns++; }
-        public int GetElapsedTurn() { return ElapsedTurns; }
-
-        public int Priority { get; set; }
-        public GamePhase Step { get; set; }
-        public int ElapsedTurns { get; set; }
-
-        public Move CurrentMove { get; set; }
-        public bool IsGameFinished { get { return isGameFinished; } }
-
-        public List<int> TurnOrder { get; set; }
-
-        private LinkedList<MTGEvent> eventQueue;
-        public MTGEvent GetNextEvent() { return eventQueue.First.Value; }
-
-
-
-
-        // 内部
-
-        private bool canPlayLand;
-        private bool isGameFinished;
-
-        public List<GameState> MoveNode { get; set; }
-
-        private bool IsTargetExists()
-        {
-            return false;
-        }
-
-        private bool IsManaCostSatisfied(string cost, MTGPlayer player)
-        {
-            bool result = false;
-
-            // calc max mana in manapool
-            int max = player.ManaPool.Sum();
-            List<int> costList = new List<int>() { 0, 0, 0, 0, 0, 0, 0 };
-            List<int> tmp = new List<int>(player.ManaPool);
-
-            var match = cost.Split('{');
-            foreach (var m in match)
-            {
-                var ms = m;
-                if (m.Length <= 0) { continue; } else { ms = m.Substring(0, m.Length - 1); }
-
-                switch (ms)
+                // プレイヤーの敗北チェック
+                foreach (var player in GetAPNAP())
                 {
-                    case "W": costList[(int)Color.White]++; break;
-                    case "U": costList[(int)Color.Blue]++; break;
-                    case "B": costList[(int)Color.Black]++; break;
-                    case "R": costList[(int)Color.Red]++; break;
-                    case "G": costList[(int)Color.Green]++; break;
-                    case "C": costList[(int)Color.Colorless]++; break;
-                    case "X":
-                    case "Y":
-                    case "Z":
-                        break;
-                    default:
-                        // 不特定マナ
-                        costList[(int)Color.Generic] += int.Parse(ms);
-                        break;
+                    // 敗北していれば敗北アクションを生成
+                    player.GenerateStateBasedActions();
                 }
-            }
 
-            tmp[0] = (tmp[0] - costList[0] >= 0) ? tmp[0] - costList[0] : 0;
-            tmp[1] = (tmp[1] - costList[1] >= 0) ? tmp[1] - costList[1] : 0;
-            tmp[2] = (tmp[2] - costList[2] >= 0) ? tmp[2] - costList[2] : 0;
-            tmp[3] = (tmp[3] - costList[3] >= 0) ? tmp[3] - costList[3] : 0;
-            tmp[4] = (tmp[4] - costList[4] >= 0) ? tmp[4] - costList[4] : 0;
-            tmp[5] = (tmp[5] - costList[5] >= 0) ? tmp[5] - costList[5] : 0;
+                // パーマネントの状態チェック
+                foreach (var player in GetAPNAP())
+                {
+                    foreach (var permanent in player.Permanents)
+                    {
+                        permanent.GenerateStateBasedActions();
+                    }
+                }
 
-            if (costList[(int)Color.White] <= player.ManaPool[(int)Color.White] &&
-                costList[(int)Color.Blue] <= player.ManaPool[(int)Color.Blue] &&
-                costList[(int)Color.Black] <= player.ManaPool[(int)Color.Black] &&
-                costList[(int)Color.Red] <= player.ManaPool[(int)Color.Red] &&
-                costList[(int)Color.Green] <= player.ManaPool[(int)Color.Green] &&
-                costList[(int)Color.Colorless] <= player.ManaPool[(int)Color.Colorless] &&
-                costList[(int)Color.Generic] <= tmp.Sum())
-            {
-                result = true;
-            }
-            return result;
-        }
-    }
-
-    //-------------------------------------------------------------
-    // ディープコピー機能を持った拡張メソッド
-    //-------------------------------------------------------------
-    static class Utilities
-    {
-        public static object DeepCopy(this object target)
-        {
-            object result;
-            BinaryFormatter b = new BinaryFormatter();
-            MemoryStream mem = new MemoryStream();
-
-            try
-            {
-                b.Serialize(mem, target);
-                mem.Position = 0;
-                result = b.Deserialize(mem);
-#if NULL
-                System.Diagnostics.Debug.Print("CopyEnd, Size(bytes):{0}", mem.Length);
-#endif
-            }
-            finally
-            {
-                mem.Close();
-            }
-            return result;
-        }
-
-        public static void Shuffle<T>(this IList<T> list)
-        {
-            RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
-            int n = list.Count;
-            while (n > 1)
-            {
-                byte[] box = new byte[1];
-                do provider.GetBytes(box);
-                while (!(box[0] < n * (Byte.MaxValue / n)));
-                int k = (box[0] % n);
-                n--;
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
+                // ゲームの状態を更新
+                Update();
             }
         }
 
-        public static string Join(this List<int> list)
+        // ゲームを巻き戻す
+        public void Restore()
         {
-            return string.Join(",", list.Select(item => item.ToString()).ToArray());
+            MTGAction action = actions.Last();
+            action.UndoAction(this);
+        }
+
+        // フェイズを実行
+        public void ExecutePhase()
+        {
+            Phase.ExecutePhase(this);
+        }
+
+        // アクションを登録
+        public void AddAction(MTGAction action)
+        {
+            actions.AddLast(action);
+        }
+
+        // アクションを実行
+        public void DoAction(MTGAction action)
+        {
+            // 行ったアクションを記録
+            actions.AddLast(action);
+
+            // アクションを実行
+            action.DoAction(this);
+
+            // アクションスコアを加算
+            Score += action.GetScore(this.scorePlayer);            
+        }
+
+        // 遅延アクションを登録
+        public void AddDelayedAction(MTGAction action)
+        {
+            delayedActions.AddLast(action);
+        }
+
+        // 遅延アクションを実行
+        public void DoDelayedAction()
+        {
+            while (delayedActions.Count != 0)
+            {
+                var action = delayedActions.First();
+                delayedActions.RemoveFirst();
+                DoAction(action);
+            }
+        }
+
+        // イベントを実行
+        public void ExecuteEvent(MTGEvent mtgevent, MTGChoiceResults choiceResults)
+        {
+            System.Diagnostics.Debug.Assert(choiceResults != null);
+
+            mtgevent.Execute(this, choiceResults);
+        }
+
+        public void ExecuteNextEvent(MTGChoiceResults choiceResults)
+        {
+            DoAction(new ExecuteFirstEventAction(choiceResults));
+        }
+
+        // プレイヤーリストをAPNAP順で取得
+        public List<MTGPlayer> GetAPNAP()
+        {
+            var ret = new List<MTGPlayer>() { TurnPlayer };
+            ret.AddRange(TurnPlayer.Opponents);
+            return ret;
         }
     }
 

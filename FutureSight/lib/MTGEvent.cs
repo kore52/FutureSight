@@ -9,14 +9,17 @@ using System.Security.Cryptography;
 
 namespace FutureSight.lib
 {
-    public class MTGEvent
+    public abstract class MTGEvent
     {
-        public static readonly object[] NO_CHOICE_RESULTS = new object[0];
-
         public MTGPlayer Player { get; private set; }
-        public MTGChoice Choice { get; private set; }
+        public List<MTGChoice> Choices { get; private set; }
         public MTGTarget Target { get; private set; }
-        public MTGAction Action { get; private set; }
+        public MTGEventAction Action { get; private set; }
+
+        public void Execute(GameState game, MTGChoiceResults choiceResults)
+        {
+            Action.ExecuteEvent(game, this);
+        }
     }
     
     interface MTGCost
@@ -25,16 +28,5 @@ namespace FutureSight.lib
     
     public class MTGDrawEvent : MTGEvent
     {
-    }
-    
-    
-    public class MTGChoice
-    {
-        public MTGChoice() {}
-    }
-    
-    public class MTGCardChoice : MTGChoice
-    {
-        public List<MTGCard> GetResults(GameState state, MTGEvent aEvent)
     }
 }

@@ -55,13 +55,17 @@
     <Compile Include="lib\Evaluate.cs" />
     <Compile Include="lib\GameState.cs" />
     <Compile Include="lib\MTGAction.cs" />
+    <Compile Include="lib\MTGChoice.cs" />
     <Compile Include="lib\MTGEvent.cs" />
+    <Compile Include="lib\MTGEventAction.cs" />
     <Compile Include="lib\MTGPermanent.cs" />
     <Compile Include="lib\MTGPhase.cs" />
     <Compile Include="lib\MTGTarget.cs" />
+    <Compile Include="lib\MTGTrigger.cs" />
     <Compile Include="lib\MurmurHash.cs" />
     <Compile Include="lib\MTGPlayer.cs" />
     <Compile Include="lib\Simulator.cs" />
+    <Compile Include="lib\Utilities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -13,14 +13,10 @@ namespace FutureSight.lib
         private int score;
 
         // アクションを行う
-        public void DoAction(GameState game)
-        {
-        }
+        public virtual void DoAction(GameState game) {}
 
         // アクションを戻す
-        public void UndoAction(GameState game)
-        {
-        }
+        public virtual void UndoAction(GameState game) {}
 
         // アクションスコアをセット
         public void SetScore(MTGPlayer scorePlayer, int score)
@@ -30,7 +26,7 @@ namespace FutureSight.lib
         }
 
         // アクションに対するスコアを取得
-        // アクションを行うプレイヤーが評価するプレイヤーと同じであれば加算、対戦相手であれば減算
+        // アクションを行うプレイヤーが評価するプレイヤーと同じであればプラス、対戦相手であればマイナス
         public int GetScore(MTGPlayer player)
         {
             return (player.ID == scorePlayer.ID) ? score : -score;
@@ -50,7 +46,7 @@ namespace FutureSight.lib
             this.player = player;
         }
 
-        public new void DoAction(GameState game)
+        public override void DoAction(GameState game)
         {
 #if DEBUG
             System.Diagnostics.Debug.Assert(player.Hand.Contains(card));
@@ -58,9 +54,12 @@ namespace FutureSight.lib
             permanent = new MTGPermanent(card);
             player.Permanents.Add(permanent);
             player.Hand.Remove(card);
+
+            // スコア計算
+            SetScore(player, permanent.Score);
         }
 
-        public new void UndoAction(GameState game)
+        public override void UndoAction(GameState game)
         {
             player.Permanents.Remove(permanent);
             player.Hand.Add(card);
@@ -80,13 +79,13 @@ namespace FutureSight.lib
             this.choiceResults = choiceResults;
         }
 
-        public new void DoAction(GameState game)
+        public override void DoAction(GameState game)
         {
             firstEvent = game.Events.First.Value;
             game.ExecuteEvent(firstEvent, choiceResults);
         }
 
-        public new void UndoAction(GameState game)
+        public override void UndoAction(GameState game)
         {
             game.Events.AddFirst(firstEvent);
         }
@@ -103,19 +102,19 @@ namespace FutureSight.lib
             toLocation = to;
         }
 
-        public new void DoAction(GameState game)
+        public override void DoAction(GameState game)
         {
             var controller = permanent.Controller;
 
             // パーマネントの除外
             controller.Permanents.Remove(permanent);
 
-            // スコアの減算
+            // スコア計算
             var score = GetScore(controller) - permanent.Score;
             SetScore(controller, score);
         }
 
-        public new void UndoAction(GameState game)
+        public override void UndoAction(GameState game)
         {
 
         }

@@ -25,8 +25,13 @@ namespace FutureSight.lib
 
         public AIScore(int score, int depth)
         {
-            this.score = score;
+            this.score = Math.Max(Math.Min(score, int.MaxValue), -int.MaxValue);
             this.depth = depth;
+        }
+        
+        public GetScore(int depthIncrements)
+        {
+            return new AIScore(score, depth + depthIncrements);
         }
     }
     
@@ -43,80 +48,35 @@ namespace FutureSight.lib
         public MTGChoice FindNextEventChoiceResults(GameState game)
         {
             MTGEvent ev = game.GetNextEvent();
+            var scoreBoard = new Dictionary<long, AIScore>();
+            
+            var aiChoiceResults = new List<MTGChoiceResults>();
             
             // search choices related by next event
             foreach (var choice in ev.Choices)
             {
+                aiChoiceResults.Add(choice);
+                
                 GameState copiedGame = (GameState)Utilities.DeepCopy(game);
                 
                 // TODO : multi threading
                 {
                     stopWatch.Reset();
                     stopWatch.Start();
-                    var worker = new AIWorker();
-                    worker.RunGame(choice, 0, 5000);
-                
-                    // record score
-                    var gameId = 
+                    var worker = new AIWorker(0, game, scoreBoard);
+                    worker.EvaluateGame(choice, 5000);
                 }
             }
-            return null;
-        }
-
-        /*
-        public static void Calculate(GameTree tree, int depth)
-        {
-            if (depth > (int)Depth.Max) { return; }
-
-            if (tree == null)
-            {
-                tree = new GameTree();
-            }
-
-            var moveCandidates = Search(tree);
             
-            /*
-            tree.Node
-/*            foreach (var move in moveCandidates)
-            {
-                // 探索した行動ごとに盤面を進める
-                GameState stateAfterMove = DoMove(move, tree.Data);
-                GameTree newTree = new GameTree(stateAfterMove);
-
-                // 移動後の評価値を計算
-                newTree.Score = Evaluate.evaluate(stateAfterMove);
-
-                // 親ノードのスコアを更新
-                tree.Score = Math.Max(tree.Score, newTree.Score);
-
-                tree.Node.Add(newTree);
-
-#if DEBUG
-                // 木の状態を表示
-                string sp = "";
-                for (int c = 0; c < depth; c++) { sp += " "; }
-                System.Diagnostics.Debug.Print(String.Format(sp + "Depth{0}->{1}: ActPly:{2}, Pri:{3}, Turn:{4}, Step:{5}",
-                    depth, depth + 1,
-                    stateAfterMove.GetActivePlayerNumber(),
-                    stateAfterMove.Priority,
-                    (int)stateAfterMove.ElapsedTurns,
-                    (int)stateAfterMove.Step));
-
-                // 盤面の状態を表示
-                System.Diagnostics.Debug.Print(String.Format(sp + "[me:H:{0}, P:{1}], [op:H:{2}, P:{3}]",
-                    Utilities.Join(stateAfterMove.Players[0].Hand),
-                    String.Join(",", stateAfterMove.Players[0].Permanents.Select(item => item.ID).ToArray()),
-                    Utilities.Join(stateAfterMove.Players[1].Hand),
-                    String.Join(",", stateAfterMove.Players[1].Permanents.Select(item => item.ID).ToArray())));
-#endif
-
-                // 子ノードの行動探索
-                Calculate(newTree, depth + 1);
-            }
-        }*/
-       
+            // 選択肢リストから最も評価値の高い選択肢を返す
+            MTChoice resultChoice = aiChoiceResults.Select(item => item.Score).Max();
+            return resultChoice;
+        }
     }
     
+    /// <summary>
+    /// 探索の分散処理用のワーカークラス
+    /// </summary>
     public class AIWorker
     {
         private int id;
@@ -135,38 +95,129 @@ namespace FutureSight.lib
             stopWatch.Start();
         }
 
-        public void EvaluateGame(MTGChoiceResults choice)
+        public void EvaluateGame(MTGChoiceResults choice, int maxTime)
         {
-            scoreBoard[game.ID] = RunGame(choice, 0, 10000);
+            scoreBoard[game.ID] = RunGame(choice, int.MinValue, int.MaxValue, 0, maxTime);
         }
 
-        private AIScore RunGame(MTGChoiceResults choice, int depth, long maxTime)
+        // 評価の必要があるステップとないステップを判定
+        private bool ShouldCache()
+        {
+            switch (game.Phase.GetType())
+            {
+            case MTGPhaseType.FirstMain:
+            case MTGPhaseType.EndOfCombat:
+            case MTGPhaseType.Cleanup:
+                return game.Step == MTGStep.NextPhase;
+                break;
+            default:
+                break;
+            }
+            return false;
+        }
+        
+        private AIScore RunGame(MTGChoiceResults nextChoiceResults, int pruneScoreBest ref, int pruneScoreWorst ref, int depth, long maxTime)
         {
             // キューに溜まっているイベントを処理
-            if (choice != null)
+            if (nextChoiceResults != null)
             {
-                game.ExecuteNextEvent(choice);
+                game.ExecuteNextEvent(nextChoiceResults);
             }
-
-            // スレッドの終了条件を満たしていれば評価値を返す
+            
+            // 評価の終了条件を満たしていればただちに評価値を返す
             if (stopWatch.ElapsedMilliseconds > maxTime)
             {
                 var aiScore = new AIScore(game.Score, depth);
                 return aiScore;
             }
-
+            
+            // ループを終了する条件はゲームが終了するか、時間をオーバーするか
             while (!game.IsFinished)
             {
+                AIScore bestScore;
                 if (game.Events.Count > 0)
                 {
+                    // フェイズの処理
                     game.ExecutePhase();
-
-                    var mtgevent = game.GetNextEvent();
-                    mtgevent.Action.ExecuteEvent(game, mtgevent);
+                    
+                    // スコアの評価が必要なフェイズ（ステップ）であるか
+                    if (ShouldCache())
+                    {
+                        // すでに評価値が計算されている盤面の場合は評価を省略
+                        AIScore returnBestScore;
+                        var gameID = game.ID + pruneScoreBest;
+                        bestScore = scoreBoard[(long)gameID];
+                        if (bestScore == null)
+                        {
+                            // 盤面が評価されていない場合は評価を行い評価値を返す
+                            returnBestScore = RunGame(null, pruneScoreBest, pruneScoreWorst, depth, maxTime);
+                            scoreBoard[(long)gameID] = -returnBestScore.score;
+                        }
+                        else
+                        {
+                            returnBestScore = bestScore.getScore(depth);
+                        }
+                        return returnBestScore;
+                    }
+                    continue;
                 }
+                
+                // イベントの実行
+                var mtgevent = game.GetNextEvent();
+                mtgevent.Action.ExecuteEvent(game, mtgevent);
+                if (!mtgevent.HasChoice())
+                {
+                    game.ExecutNextEvent();
+                    continue;
+                }
+
+                // イベントの選択肢の取得
+                var choiceResultList = mtgevent.GetChoiceResults(game);
+                
+                // 選択肢が１つしか存在しないならばそのままイベントを処理
+                if (choiceResultList.Count == 1)
+                {
+                    game.ExecuteNextEvent(choiceresultList.First);
+                    continue;
+                }
+                
+                // 選択肢が複数ある場合、それぞれに対して評価を行う
+                bool best = (game.ScorePlayer == event.Player);
+                long slice = (maxTime - stopWatch.ElapsedMilliseconds) / choiceResultList.Count;
+                foreach (var choiceResult in choiceResultList)
+                {
+                    // 残り時間の設定
+                    end += slice;
+                    
+                    // その選択肢を取った場合のスコアを計算
+                    var subtreeScore = RunGame(choiceResult, pruneScoreBest, pruneScoreWorst, depth + 1, end);
+                    
+                    // 評価値の計算
+                    // 評価を行うプレイヤーとイベントを行うプレイヤーが同一である場合は大きな評価値、
+                    // 対戦相手の評価値ならば負の評価値として計算する
+                    if (best)
+                    {
+                        bestScore.score = (subtreeScore.score > bestScore.score) ? subtreeScore.score : bestScore.score;
+                        
+                        // 規定スコア以下ならこれ以上は評価しない
+                        if (bestScore.score > pruneScoreWorst) break;
+                    } else {
+                        bestScore.score = (subtreeScore.score < bestScore.score) ? subtreeScore.score : bestScore.score;
+                        
+                        // 規定スコア以下ならこれ以上は評価しない
+                        if (bestScore.score < pruneScoreBest) break;
+                    }
+                }
+                
+                // ゲームを巻き戻す
+                game.Restore();
+                return bestScore;
             }
 
-            return new AIScore();
+            // ゲーム終了
+            var finScore = new AIScore(game.Score, depth);
+            game.Restore();
+            return finScore;
         }
     }
 }

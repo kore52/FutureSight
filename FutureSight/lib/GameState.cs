@@ -80,6 +80,7 @@ namespace FutureSight.lib
         public GameState()
         {
             Turn = 0;
+            Score = 0;
             TurnOrder = new List<int>() { (int)PLAYER._0, (int)PLAYER._1 };
 
             Players = new List<MTGPlayer>();
@@ -144,10 +145,12 @@ namespace FutureSight.lib
         }
 
         // 状況起因処理
-        public bool IsStateCheckRequired { get; set; }
+        private bool stateCheckFlag = false;
+        private bool SetStateCheckRequired { set { stateCheckFlag; } }
+        public bool IsStateCheckRequired { get { return stateCheckFlag; } }
         public void CheckStatePutTriggers()
         {
-            // チェックの必要がなくなるまで繰り返す
+            // 状況起因処理の必要がなくなるまで繰り返す
             while (IsStateCheckRequired)
             {
                 IsStateCheckRequired = false;
@@ -160,6 +163,7 @@ namespace FutureSight.lib
                 }
 
                 // パーマネントの状態チェック
+                // タフネス0での墓地移動、致死ダメージでの破壊、オーラ、+1/+1,-1/-1カウンターの相殺などを行う
                 foreach (var player in GetAPNAP())
                 {
                     foreach (var permanent in player.Permanents)
@@ -198,11 +202,11 @@ namespace FutureSight.lib
             // 行ったアクションを記録
             actions.AddLast(action);
 
-            // アクションを実行
+            // 渡されたアクションオブジェクト毎に異なるアクションを実行
             action.DoAction(this);
 
             // アクションスコアを加算
-            Score += action.GetScore(this.scorePlayer);            
+            Score += action.GetScore(this.scorePlayer);
         }
 
         // 遅延アクションを登録
@@ -223,13 +227,17 @@ namespace FutureSight.lib
         }
 
         // イベントを実行
+        //  chioceResults: 選択肢がある場合の結果
         public void ExecuteEvent(MTGEvent mtgevent, MTGChoiceResults choiceResults)
         {
             System.Diagnostics.Debug.Assert(choiceResults != null);
 
+            // 渡されたイベントオブジェクト毎に異なるイベントを実行
             mtgevent.Execute(this, choiceResults);
         }
 
+        // 次のイベントを実行
+        // 処理すべきイベントが無くなった段階で呼ばれるメソッド
         public void ExecuteNextEvent(MTGChoiceResults choiceResults)
         {
             DoAction(new ExecuteFirstEventAction(choiceResults));
@@ -242,26 +250,5 @@ namespace FutureSight.lib
             ret.AddRange(TurnPlayer.Opponents);
             return ret;
         }
-    }
-
-    public class GameTree
-    {
-        public GameTree ()
-        {
-            Node = new List<GameTree>();
-        }
-        public GameTree (GameTree t)
-        {
-            Node = new List<GameTree>(t.Node);
-            Data = (GameState)Utilities.DeepCopy(t.Data);
-        }
-        public GameTree (GameState s)
-        {
-            Node = new List<GameTree>();
-            Data = s;
-        }
-        public List<GameTree> Node { get; set; }
-        public GameState Data { get; set; }
-        public int Score { get; set; }
     }
 }

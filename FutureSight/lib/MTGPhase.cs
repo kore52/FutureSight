@@ -20,6 +20,7 @@ namespace FutureSight.lib
 
     public enum MTGPhaseType
     {
+        Null,
         Untap,
         Upkeep,
         Draw,
@@ -34,13 +35,8 @@ namespace FutureSight.lib
         Cleanup
     }
     
-    public class MTGPhase
+    public abstract class MTGPhase
     {
-        public string Step { get { return step; } }
-        protected string step;
-
-        public void ExecuteBeginPhase(GameState game) { }
-
         public void ExecutePhase(GameState game)
         {
             switch (game.Step)
@@ -63,6 +59,9 @@ namespace FutureSight.lib
                     break;
             }
         }
+        public abstract MTGPhase GetInstance();
+        public abstract void ExecuteBeginPhase(GameState game);
+        public abstract MTGPhaseType GetType();
     }
     
     // ステップ固有処理
@@ -70,155 +69,203 @@ namespace FutureSight.lib
     {
         private static MTGPhase instance;
         
-        public MTGPhase GetInstance() { return instance ?? (instance = new MTGUntapStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGUntapStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "Untap";
+        public override MTGPhaseType GetType() { return MTGPhaseType.Untap; }
     }
     
     public class MTGUpkeepStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGUpkeepStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGUpkeepStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "Upkeep";
+        public override MTGPhaseType GetType() { return MTGPhaseType.Upkeep; }
     }
     
     public class MTGDrawStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGDrawStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGDrawStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "Draw";
+        public override MTGPhaseType GetType() { return MTGPhaseType.Draw; }
     }
 
     public class MTGFirstMainPhase : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGFirstMainPhase()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGFirstMainPhase(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "FirstMain";
+        public override MTGPhaseType GetType() { return MTGPhaseType.FirstMain; }
     }
 
     public class MTGPreCombatStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGPreCombatStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGPreCombatStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "PreCombat";
+        public override MTGPhaseType GetType() { return MTGPhaseType.PreCombat; }
     }
 
     public class MTGDeclareAttackerStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGDeclareAttackerStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGDeclareAttackerStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "DeclareAttacker";
+        public override MTGPhaseType GetType() { return MTGPhaseType.DeclareAttacker; }
     }
 
     public class MTGDeclareBlockerStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGDeclareBlockerStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGDeclareBlockerStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "DeclareBlocker";
+        public override MTGPhaseType GetType() { return MTGPhaseType.DeclareBlocker; }
     }
 
     public class MTGDamageStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGDamageStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGDamageStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "Damage";
+        private override string step = "Damage";
     }
 
     public class MTGEndCombatStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGEndCombatStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGEndCombatStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "EndCombat";
+        public override MTGPhaseType GetType() { return MTGPhaseType.EndCombat; }
     }
 
     public class MTGSecondMainPhase : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGSecondMainPhase()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGSecondMainPhase(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "SecondMain";
+        public override MTGPhaseType GetType() { return MTGPhaseType.SecondMain; }
     }
 
     public class MTGEndStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGEndStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGEndStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "End";
+        public override MTGPhaseType GetType() { return MTGPhaseType.End; }
     }
 
     public class MTGCleanupStep : MTGPhase
     {
         private static MTGPhase instance;
         
-        MTGPhase GetInstance() { return instance ?? (instance = new MTGCleanupStep()); }
+        public override MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGCleanupStep(); }
+            return instance;
+        }
         
-        public new void ExecuteBeginPhase(GameState game)
+        public override void ExecuteBeginPhase(GameState game)
         {
         }
         
-        private new string step = "Cleanup";
+        public override MTGPhaseType GetType() { return MTGPhaseType.Cleanup; }
     }
 }

@@ -21,6 +21,7 @@ namespace FutureSight.lib
     public enum MTGPhaseType
     {
         Null,
+        Mulligan,
         Untap,
         Upkeep,
         Draw,
@@ -267,5 +268,42 @@ namespace FutureSight.lib
         }
         
         public override MTGPhaseType GetType() { return MTGPhaseType.Cleanup; }
+    }
+    
+    public class MTGGamePlayProgression
+    {
+        public static MTGPhase NextPhase(GameState game)
+        {
+            switch (game.Phase)
+            {
+            case Untap:
+                return MTG
+                break;
+            case Upkeep:
+                break;
+            case Draw:
+                break;
+            case FirstMain:
+                break;
+            case PreCombat:
+                break;
+            case DeclareAttacker:
+                break;
+            case DeclareBlocker:
+                break;
+            case Damage:
+                break;
+            case EndCombat:
+                break;
+            case SecondMain:
+                break;
+            case End:
+                break;
+            case Cleanup:
+                break;
+            default:
+                throw Exception("Invalid step");
+            }
+        }
     }
 }

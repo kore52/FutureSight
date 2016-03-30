@@ -76,17 +76,20 @@ namespace FutureSight.lib
         private MTGPlayer scorePlayer;
         public MTGPlayer TurnPlayer { get; set; }
         private LinkedList<MTGEvent> eventQueue;
-
+        
+        // method
+        
         public GameState()
         {
             Turn = 0;
             Score = 0;
             TurnOrder = new List<int>() { (int)PLAYER._0, (int)PLAYER._1 };
-
             Players = new List<MTGPlayer>();
             Stack = new LinkedList<string>();
 
             Priority = (int)PLAYER._0;
+            
+            Initialize();
         }
 
         public void Initialize()
@@ -249,6 +252,14 @@ namespace FutureSight.lib
             var ret = new List<MTGPlayer>() { TurnPlayer };
             ret.AddRange(TurnPlayer.Opponents);
             return ret;
+        }
+        
+        public static GameState CreateGame(List<MTGPlayer> players, MTGPlayer startPlayer)
+        {
+            var game = new GameState();
+            game.Players = players;
+            game.TurnPlayer = startPlayer;
+            return game;
         }
     }
 }

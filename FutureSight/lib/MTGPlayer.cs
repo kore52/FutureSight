@@ -36,8 +36,33 @@ namespace FutureSight.lib
 
         // プレイヤーが持つ効果
         private MTGAbilityType ability;
-
         public GameState CurrentGame { get; set; }
+        public string Name { get; private set; }
+        public int Life { get; private set; } = 20;
+        public Dictionary<MTGCounterType, int> Counters { get; private int; }
+        public int LosePoisonCounter { get; private set; } = 10;
+        public long ID
+        {
+            get
+            {
+                long id = 0;
+                id += (long)Life              * 1000000000;
+                id += (long)Counters[Poison]  * 100000000;
+                id += (long)Hand.Count        * 1000000;
+                id += (long)Permanents.Count  * 10000;
+                id += (long)Graveyard.Count   * 1000;
+                id += (long)Library.Count     * 100;
+                id += (long)Exile.Count;
+                return id;
+            }
+        }
+        public bool IsWin { get; private set; } = false;
+        public bool IsLose { get; private set; } = false;
+        public bool IsEmptyDraw { get; private set; } = false;
+        public bool CanPlayLand { get { return (maxPlayableLand > countPlayedLand) ? true : false; } }
+        private int maxPlayableLand = 1;
+        private int countPlayedLand = 0;
+        public bool HasAbility(MTGAbilityType type) { return ability.HasFlag(type);  }
 
         public MTGPlayer()
         {
@@ -47,41 +72,15 @@ namespace FutureSight.lib
             Library = new List<MTGCard>();
             Sideboard = new List<MTGCard>();
             Permanents = new List<MTGPermanent>();
-
-            Life = 20;
-            Poison = 0;
             ManaPool = new List<int>() { 0, 0, 0, 0, 0, 0 };
+            Counters = new Dictionary<MTGCounterType, int>();
         }
-
-        public string Name { get; private set; }
-        public int Life { get; private set; }
-        public int Poison { get; private set; }
-
-        public long ID
+        
+        public MTGPlayer(int initialLife, int losePoisonCounter) : this()
         {
-            get
-            {
-                long id = 0;
-                id += Life              * 1000000000;
-                id += Poison            * 100000000;
-                id += Hand.Count        * 1000000;
-                id += Permanents.Count  * 10000;
-                id += Graveyard.Count   * 1000;
-                id += Library.Count     * 100;
-                id += Exile.Count;
-                return id;
-            }
+            Life = initialLife;
+            LosePoisonCounter = losePoisonCounter;
         }
-
-        public bool IsWin { get; private set; } = false;
-        public bool IsLose { get; private set; } = false;
-        public bool IsEmptyDraw { get; private set; } = false;
-
-        public bool CanPlayLand { get { return (maxPlayableLand > countPlayedLand) ? true : false; } }
-        private int maxPlayableLand = 1;
-        private int countPlayedLand = 0;
-
-        public bool HasAbility(MTGAbilityType type) { return ability.HasFlag(type);  }
 
         // プレイヤーの状況起因処理（敗北チェック）
         public void GenerateStateBasedActions()
@@ -91,7 +90,7 @@ namespace FutureSight.lib
                 // TODO
             }
 
-            if (Poison >= 10)
+            if (Counters[Poison] >= LosePoisonCounter)
             {
                 // TODO
             }

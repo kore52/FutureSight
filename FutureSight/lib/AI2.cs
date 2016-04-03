@@ -29,7 +29,7 @@ namespace FutureSight.lib
             this.depth = depth;
         }
         
-        public GetScore(int depthIncrements)
+        public AIScore GetScore(int depthIncrements)
         {
             return new AIScore(score, depth + depthIncrements);
         }
@@ -45,7 +45,7 @@ namespace FutureSight.lib
             stopWatch = new Stopwatch();
         }
         
-        public MTGChoice FindNextEventChoiceResults(GameState game)
+        public List<object> FindNextEventChoiceResults(GameState game)
         {
             MTGEvent ev = game.GetNextEvent();
             var scoreBoard = new Dictionary<long, AIScore>();
@@ -53,9 +53,10 @@ namespace FutureSight.lib
             var aiChoiceResults = new List<MTGChoiceResults>();
             
             // search choices related by next event
-            foreach (var choice in ev.Choices)
+            foreach (var choice in ev.GetChoiceResults(game))
             {
-                aiChoiceResults.Add(choice);
+                var achoice = new MTGChoiceResults(choice);
+                aiChoiceResults.Add(achoice);
                 
                 GameState copiedGame = (GameState)Utilities.DeepCopy(game);
                 
@@ -64,12 +65,14 @@ namespace FutureSight.lib
                     stopWatch.Reset();
                     stopWatch.Start();
                     var worker = new AIWorker(0, game, scoreBoard);
-                    worker.EvaluateGame(choice, 5000);
+                    worker.EvaluateGame(achoice, 5000);
                 }
             }
-            
+
             // 選択肢リストから最も評価値の高い選択肢を返す
-            MTChoice resultChoice = aiChoiceResults.Select(item => item.Score).Max();
+            
+            List<object> resultChoice = new List<object>();
+            resultChoice.Add(aiChoiceResults.Aggregate((r1, r2) => r1.Score.score > r2.Score.score ? r1 : r2).Max());
             return resultChoice;
         }
     }
@@ -97,26 +100,25 @@ namespace FutureSight.lib
 
         public void EvaluateGame(MTGChoiceResults choice, int maxTime)
         {
-            scoreBoard[game.ID] = RunGame(choice, int.MinValue, int.MaxValue, 0, maxTime);
+            int min = int.MinValue;
+            int max = int.MaxValue;
+            scoreBoard[game.ID] = RunGame(choice, ref min, ref max, 0, maxTime);
         }
 
         // 評価の必要があるステップとないステップを判定
         private bool ShouldCache()
         {
-            switch (game.Phase.GetType())
+            switch (game.Phase.Type)
             {
             case MTGPhaseType.FirstMain:
-            case MTGPhaseType.EndOfCombat:
+            case MTGPhaseType.EndCombat:
             case MTGPhaseType.Cleanup:
                 return game.Step == MTGStep.NextPhase;
-                break;
-            default:
-                break;
             }
             return false;
         }
         
-        private AIScore RunGame(MTGChoiceResults nextChoiceResults, int pruneScoreBest ref, int pruneScoreWorst ref, int depth, long maxTime)
+        private AIScore RunGame(MTGChoiceResults nextChoiceResults, ref int pruneScoreBest, ref int pruneScoreWorst, int depth, long maxTime)
         {
             // キューに溜まっているイベントを処理
             if (nextChoiceResults != null)
@@ -134,7 +136,7 @@ namespace FutureSight.lib
             // ループを終了する条件はゲームが終了するか、時間をオーバーするか
             while (!game.IsFinished)
             {
-                AIScore bestScore;
+                AIScore bestScore = new AIScore();
                 if (game.Events.Count > 0)
                 {
                     // フェイズの処理
@@ -150,12 +152,13 @@ namespace FutureSight.lib
                         if (bestScore == null)
                         {
                             // 盤面が評価されていない場合は評価を行い評価値を返す
-                            returnBestScore = RunGame(null, pruneScoreBest, pruneScoreWorst, depth, maxTime);
-                            scoreBoard[(long)gameID] = -returnBestScore.score;
+                            returnBestScore = RunGame(null, ref pruneScoreBest, ref pruneScoreWorst, depth, maxTime);
+                            returnBestScore.score = -returnBestScore.score;
+                            scoreBoard[(long)gameID] = returnBestScore;
                         }
                         else
                         {
-                            returnBestScore = bestScore.getScore(depth);
+                            returnBestScore = bestScore.GetScore(depth);
                         }
                         return returnBestScore;
                     }
@@ -167,7 +170,7 @@ namespace FutureSight.lib
                 mtgevent.Action.ExecuteEvent(game, mtgevent);
                 if (!mtgevent.HasChoice())
                 {
-                    game.ExecutNextEvent();
+                    game.ExecuteNextEvent();
                     continue;
                 }
 
@@ -177,20 +180,21 @@ namespace FutureSight.lib
                 // 選択肢が１つしか存在しないならばそのままイベントを処理
                 if (choiceResultList.Count == 1)
                 {
-                    game.ExecuteNextEvent(choiceresultList.First);
+                    game.ExecuteNextEvent(choiceResultList);
                     continue;
                 }
                 
                 // 選択肢が複数ある場合、それぞれに対して評価を行う
-                bool best = (game.ScorePlayer == event.Player);
-                long slice = (maxTime - stopWatch.ElapsedMilliseconds) / choiceResultList.Count;
+                bool best = (game.ScorePlayer == mtgevent.Player);
+                long end = stopWatch.ElapsedMilliseconds;
+                long slice = (maxTime - end) / choiceResultList.Count;
                 foreach (var choiceResult in choiceResultList)
                 {
                     // 残り時間の設定
                     end += slice;
                     
                     // その選択肢を取った場合のスコアを計算
-                    var subtreeScore = RunGame(choiceResult, pruneScoreBest, pruneScoreWorst, depth + 1, end);
+                    var subtreeScore = RunGame(new MTGChoiceResults(choiceResult), ref pruneScoreBest, ref pruneScoreWorst, depth + 1, end);
                     
                     // 評価値の計算
                     // 評価を行うプレイヤーとイベントを行うプレイヤーが同一である場合は大きな評価値、

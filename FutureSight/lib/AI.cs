@@ -20,7 +20,7 @@ plyr,blckdet,[attk_creature|
 
 namespace FutureSight.lib
 {
-    public class AI
+/*    public class AI
     {
         // 思考ルーチン
         public static void Calculate(GameTree tree, int depth)
@@ -249,7 +249,7 @@ namespace FutureSight.lib
             }
             return result;
         }
-    }
+    }*/
 }
 
 

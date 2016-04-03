@@ -44,7 +44,7 @@ namespace FutureSight.lib
                 csvReader.Configuration.RegisterClassMap<CardDefinitionMap>(); 
                 while (csvReader.Read())
                 {
-                    var rec = csvReader.GetRecord<CardDefinitionMap>();
+                    var rec = csvReader.GetRecord<MTGCardDefiniton>();
                     int hash = MurMurHash3.Hash(rec.CardName + rec.Expansion + rec.CollectorNumber);
                     database.Add(hash, new MTGCard());
                 }
@@ -80,27 +80,27 @@ namespace FutureSight.lib
     {
         public CardDefinitionMap()
         {
-            Map(m => m.cardName);
-            Map(m => m.manaCost);
-            Map(m => m.cardType);
-            Map(m => m.specialType);
-            Map(m => m.subType);
-            Map(m => m.power);
-            Map(m => m.toughness);
-            Map(m => m.ability);
-            Map(m => m.colorIndicator);
-            Map(m => m.loyalty);
-            Map(m => m.expansion);
-            Map(m => m.collectorNumber);
-            Map(m => m.illustrator);
-            Map(m => m.flavorText);
-            Map(m => m.illustURI);
-            Map(m => m.flippable);
-            Map(m => m.refFlip);
-            Map(m => m.transformable);
-            Map(m => m.refTransform);
-            Map(m => m.splittable);
-            Map(m => m.refSplit);
+            Map(m => m.CardName);
+            Map(m => m.ManaCost);
+            Map(m => m.CardType);
+            Map(m => m.SpecialType);
+            Map(m => m.SubType);
+            Map(m => m.Power);
+            Map(m => m.Toughness);
+            Map(m => m.Ability);
+            Map(m => m.ColorIndicator);
+            Map(m => m.Loyalty);
+            Map(m => m.Expansion);
+            Map(m => m.CollectorNumber);
+            Map(m => m.Illustrator);
+            Map(m => m.FlavorText);
+            Map(m => m.IllustURI);
+            Map(m => m.Flippable);
+            Map(m => m.RefFlippedCardName);
+            Map(m => m.Transformable);
+            Map(m => m.RefTransformedCardName);
+            Map(m => m.Splittable);
+            Map(m => m.RefSplittedCardName);
         }
     }
 }

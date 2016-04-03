@@ -45,10 +45,29 @@ namespace FutureSight.lib
     [Serializable()]
     public class GameState
     {
-        public List<MTGPlayer> Players { get; set; }
+        /// <summary>
+        /// プレイヤー
+        /// </summary>
+        public List<MTGPlayer> Players { get; private set; }
+
+        /// <summary>
+        /// 領域:スタック
+        /// </summary>
         public LinkedList<string> Stack { get; set; }
+
+        /// <summary>
+        /// 優先権を持つプレイヤーID
+        /// </summary>
         public int Priority { get; set; }
+
+        /// <summary>
+        /// 現在のフェイズ・ステップ
+        /// </summary>
         public MTGPhase Phase { get; set; }
+
+        /// <summary>
+        /// フェイズ・ステップ中の状態を持つ（アクティブプレイヤー、解決中など）
+        /// </summary>
         public MTGStep Step { get; set; }
         public int Turn { get; set; }
         public Move CurrentMove { get; set; }
@@ -59,6 +78,10 @@ namespace FutureSight.lib
         public bool IsFinished { get { return false; } }
         public List<int> TurnOrder { get; set; }
         public MTGEvent GetNextEvent() { return eventQueue.First.Value; }
+
+        /// <summary>
+        /// 現在の盤面の静的評価値
+        /// </summary>
         public int Score { get; set; }
         public long ID
         {
@@ -73,7 +96,12 @@ namespace FutureSight.lib
         }
         public List<GameState> MoveNode { get; set; }
 
-        private MTGPlayer scorePlayer;
+        // スコアを評価するプレイヤー
+        public MTGPlayer ScorePlayer { get; set; }
+
+        /// <summary>
+        /// ターンを行うプレイヤー
+        /// </summary>
         public MTGPlayer TurnPlayer { get; set; }
         private LinkedList<MTGEvent> eventQueue;
         
@@ -106,15 +134,13 @@ namespace FutureSight.lib
             }
 
             // ７枚ドロー
-            foreach (var p in this.Players)
+            foreach (var player in Players)
             {
-                p.DrawCard();
-                p.DrawCard();
-                p.DrawCard();
-                p.DrawCard();
-                p.DrawCard();
-                p.DrawCard();
-                p.DrawCard();
+                for (int i=0; i < 7; i++)
+                {
+                    player.Hand.Add(player.Library.First());
+                    player.Library.RemoveAt(0);
+                }
             }
 #if DEBUG
             System.Diagnostics.Debug.Print(String.Format("game initialization is ok"));
@@ -149,14 +175,14 @@ namespace FutureSight.lib
 
         // 状況起因処理
         private bool stateCheckFlag = false;
-        private bool SetStateCheckRequired { set { stateCheckFlag; } }
+        private bool SetStateCheckRequired { set { stateCheckFlag = value; } }
         public bool IsStateCheckRequired { get { return stateCheckFlag; } }
         public void CheckStatePutTriggers()
         {
             // 状況起因処理の必要がなくなるまで繰り返す
             while (IsStateCheckRequired)
             {
-                IsStateCheckRequired = false;
+                stateCheckFlag = false;
 
                 // プレイヤーの敗北チェック
                 foreach (var player in GetAPNAP())
@@ -209,7 +235,7 @@ namespace FutureSight.lib
             action.DoAction(this);
 
             // アクションスコアを加算
-            Score += action.GetScore(this.scorePlayer);
+            Score += action.GetScore(this.ScorePlayer);
         }
 
         // 遅延アクションを登録
@@ -244,6 +270,11 @@ namespace FutureSight.lib
         public void ExecuteNextEvent(MTGChoiceResults choiceResults)
         {
             DoAction(new ExecuteFirstEventAction(choiceResults));
+        }
+        // 選択肢が無いバージョン
+        public void ExecuteNextEvent()
+        {
+            DoAction(new ExecuteFirstEventAction(null));
         }
 
         // プレイヤーリストをAPNAP順で取得

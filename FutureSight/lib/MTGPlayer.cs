@@ -11,25 +11,25 @@ namespace FutureSight.lib
     public class MTGPlayer : MTGTarget
     {
         // 手札
-        public List<MTGCard> Hand { get; private set; }
+        public List<MTGCard> Hand { get; set; }
 
         // 墓地
-        public List<MTGCard> Graveyard { get; private set; }
+        public List<MTGCard> Graveyard { get; set; }
 
         // 追放領域
-        public List<MTGCard> Exile { get; private set; }
+        public List<MTGCard> Exile { get; set; }
 
         // ライブラリー
-        public List<MTGCard> Library { get; private set; }
+        public List<MTGCard> Library { get; set; }
 
         // サイドボード
-        public List<MTGCard> Sideboard { get; private set; }
+        public List<MTGCard> Sideboard { get; set; }
 
         // コントロールしているパーマネント
-        public List<MTGPermanent> Permanents { get; private set; }
+        public List<MTGPermanent> Permanents { get; set; }
 
         // マナプール
-        public List<int> ManaPool { get; private set; }
+        public List<int> ManaPool { get; set; }
 
         // 対戦相手
         public List<MTGPlayer> Opponents { get; }
@@ -39,7 +39,7 @@ namespace FutureSight.lib
         public GameState CurrentGame { get; set; }
         public string Name { get; private set; }
         public int Life { get; private set; } = 20;
-        public Dictionary<MTGCounterType, int> Counters { get; private int; }
+        public Dictionary<MTGCounterType, int> Counters { get; private set; }
         public int LosePoisonCounter { get; private set; } = 10;
         public long ID
         {
@@ -47,7 +47,7 @@ namespace FutureSight.lib
             {
                 long id = 0;
                 id += (long)Life              * 1000000000;
-                id += (long)Counters[Poison]  * 100000000;
+                id += (long)Counters[MTGCounterType.Poison]  * 100000000;
                 id += (long)Hand.Count        * 1000000;
                 id += (long)Permanents.Count  * 10000;
                 id += (long)Graveyard.Count   * 1000;
@@ -64,6 +64,9 @@ namespace FutureSight.lib
         private int countPlayedLand = 0;
         public bool HasAbility(MTGAbilityType type) { return ability.HasFlag(type);  }
 
+        public bool IsAI { get; }
+        private AI2 ai;
+
         public MTGPlayer()
         {
             Hand = new List<MTGCard>();
@@ -76,10 +79,12 @@ namespace FutureSight.lib
             Counters = new Dictionary<MTGCounterType, int>();
         }
         
-        public MTGPlayer(int initialLife, int losePoisonCounter) : this()
+        public MTGPlayer(int initialLife, int losePoisonCounter, bool isAI = true) : this()
         {
             Life = initialLife;
             LosePoisonCounter = losePoisonCounter;
+            IsAI = isAI;
+            if (isAI) { ai = new AI2(); }
         }
 
         // プレイヤーの状況起因処理（敗北チェック）
@@ -90,11 +95,20 @@ namespace FutureSight.lib
                 // TODO
             }
 
-            if (Counters[Poison] >= LosePoisonCounter)
+            if (Counters[MTGCounterType.Poison] >= LosePoisonCounter)
             {
                 // TODO
             }
         }
 
+        // プレイヤーの手札とライブラリーを準備
+        public static void PrepareHandAndLibrary(MTGPlayer player, MTGDeck deckList)
+        {
+            // デッキリストの読み込み
+            // シャッフル
+
+            // InitialHandSizeだけドロー
+
+        }
     }
 }

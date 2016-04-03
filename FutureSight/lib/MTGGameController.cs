@@ -6,15 +6,15 @@ namespace FutureSight.lib
 {
     interface IGameController
     {
-        public void RunGame();
+        void RunGame();
     }
     
-    public class MTGGameController : IGameController
+    public class SinglePlayGameController : IGameController
     {
         private GameState game;
         private int maxTime;
         
-        public MTGGameController(GameState game, int maxTime)
+        public SinglePlayGameController(GameState game, int maxTime)
         {
             this.game = game;
             this.maxTime = maxTime;
@@ -23,7 +23,25 @@ namespace FutureSight.lib
         public void RunGame()
         {
         }
-        
-        public 
+    }
+
+    public class AutoPlayGameController : IGameController
+    {
+        private GameState game;
+        private int maxTime;
+
+        public AutoPlayGameController(GameState game, int maxTime)
+        {
+            this.game = game;
+            this.maxTime = maxTime;
+        }
+
+        public void RunGame()
+        {
+            while (true)
+            {
+                var mtgEvent = game.GetNextEvent();
+            }
+        }
     }
 }

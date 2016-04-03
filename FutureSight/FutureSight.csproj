@@ -56,8 +56,11 @@
     <Compile Include="lib\GameState.cs" />
     <Compile Include="lib\MTGAction.cs" />
     <Compile Include="lib\MTGChoice.cs" />
+    <Compile Include="lib\MTGDeck.cs" />
+    <Compile Include="lib\MTGDuel.cs" />
     <Compile Include="lib\MTGEvent.cs" />
     <Compile Include="lib\MTGEventAction.cs" />
+    <Compile Include="lib\MTGGameController.cs" />
     <Compile Include="lib\MTGPermanent.cs" />
     <Compile Include="lib\MTGPhase.cs" />
     <Compile Include="lib\MTGTarget.cs" />

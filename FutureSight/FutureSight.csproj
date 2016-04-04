@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="lib\AI.cs" />
     <Compile Include="lib\AI2.cs" />
+    <Compile Include="lib\DeckBuilder.cs" />
     <Compile Include="lib\MTGCardInfoLoader.cs" />
     <Compile Include="lib\MTGCard.cs" />
     <Compile Include="lib\Definitions.cs" />

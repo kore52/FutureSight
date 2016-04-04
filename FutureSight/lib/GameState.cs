@@ -123,12 +123,17 @@ namespace FutureSight.lib
         public void Initialize()
         {
             // プレイヤーの読み込み
-            this.Players.Add(new MTGPlayer());
-            this.Players.Add(new MTGPlayer());
+            Players.Add(new MTGPlayer());
+            Players.Add(new MTGPlayer());
 
+            // デッキの読み込み
+            foreach (var p in Players)
+            {
+                DeckBuilder.LoadDeck(p, null);
+            }
 
             // ライブラリーシャッフル
-            foreach (var p in this.Players)
+            foreach (var p in Players)
             {
                 Utilities.Shuffle(p.Library);
             }

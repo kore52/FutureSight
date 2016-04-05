@@ -1,0 +1,6 @@
+"Plains","","Land","Basic","Plains",0,0,"{T}: add {W}",,,BFW,250/274,,,,,,,,,
+"Island","","Land","Basic","Island",0,0,"{T}: add {U}",,,BFW,255/274,,,,,,,,,
+"Swamp","","Land","Basic","Swamp",0,0,"{T}: add {B}",,,BFW,260/274,,,,,,,,,
+"Mountain","","Land","Basic","Mountain",0,0,"{T}: add {R}",,,BFW,265/274,,,,,,,,,
+"Forest","","Land","Basic","Forest",0,0,"{T}: add {G}",,,BFW,270/274,,,,,,,,,
+"Wondering Ones","{U}","Creature","","Spirit",1,1,,,,CHK,100/306,Heather Hudson,,,,,,,,

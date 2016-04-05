@@ -69,10 +69,12 @@ namespace FutureSight.lib
         /// フェイズ・ステップ中の状態を持つ（アクティブプレイヤー、解決中など）
         /// </summary>
         public MTGStep Step { get; set; }
+
         public int Turn { get; set; }
-        public Move CurrentMove { get; set; }
+
         private LinkedList<MTGAction> actions;
         private LinkedList<MTGAction> delayedActions;
+
         public LinkedList<MTGEvent> Events { get; set; }
         
         public bool IsFinished { get { return false; } }
@@ -116,42 +118,7 @@ namespace FutureSight.lib
             Stack = new LinkedList<string>();
 
             Priority = (int)PLAYER._0;
-            
-            Initialize();
         }
-
-        public void Initialize()
-        {
-            // プレイヤーの読み込み
-            Players.Add(new MTGPlayer());
-            Players.Add(new MTGPlayer());
-
-            // デッキの読み込み
-            foreach (var p in Players)
-            {
-                DeckBuilder.LoadDeck(p, null);
-            }
-
-            // ライブラリーシャッフル
-            foreach (var p in Players)
-            {
-                Utilities.Shuffle(p.Library);
-            }
-
-            // ７枚ドロー
-            foreach (var player in Players)
-            {
-                for (int i=0; i < 7; i++)
-                {
-                    player.Hand.Add(player.Library.First());
-                    player.Library.RemoveAt(0);
-                }
-            }
-#if DEBUG
-            System.Diagnostics.Debug.Print(String.Format("game initialization is ok"));
-#endif
-        }
-
 
         // misc
         public int GetActivePlayerNumber()
@@ -180,7 +147,8 @@ namespace FutureSight.lib
 
         // 状況起因処理
         private bool stateCheckFlag = false;
-        private bool SetStateCheckRequired { set { stateCheckFlag = value; } }
+        private void SetStateCheckRequired(bool flag) { stateCheckFlag = flag; }
+        public void SetStateCheckRequired() { stateCheckFlag = true; }
         public bool IsStateCheckRequired { get { return stateCheckFlag; } }
         public void CheckStatePutTriggers()
         {
@@ -216,6 +184,18 @@ namespace FutureSight.lib
         {
             MTGAction action = actions.Last();
             action.UndoAction(this);
+        }
+
+        // 次のステップ・フェイズに移行
+        public void NextPhase()
+        {
+            ChangePhase(MTGDefaultGamePlay.GetInstance().NextPhase(this));
+        }
+
+        private void ChangePhase(MTGPhase phase)
+        {
+            Phase = phase;
+            Step = MTGStep.Begin;
         }
 
         // フェイズを実行

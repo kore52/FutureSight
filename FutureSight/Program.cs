@@ -12,8 +12,9 @@ namespace FutureSight
     {
         static void Initialize()
         {
+            MTGCardInfoLoader.GetInstance().ReadFromCSVFile("resources\\CardInfo.csv");
         }
-        
+
         static void RunDuel()
         {
             var newDuel = new MTGDuel();

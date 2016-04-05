@@ -24,6 +24,7 @@ namespace FutureSight.lib
         public int                              Toughness { get; set; }
         public Dictionary<MTGCounterType, int>  Counters;
         public int                              Score { get; set; }
+        public List<MTGPermanentState>          State { get; set; }
 
         public MTGPermanent()
         {
@@ -63,40 +64,41 @@ namespace FutureSight.lib
                 }
             }
         }
-        
+
+        public void AddState(MTGPermanentState state)
+            => State.Add(state);
+
+        public void RemoveState(MTGPermanentState state)
+            => State.Remove(state);
+
         public bool IsArtifact()
-        {
-            return PermanentType.HasFlag(PermanentType.Artifact);
-        }
+            => PermanentType.HasFlag(PermanentType.Artifact);
 
         public bool IsCreature()
-        {
-            return PermanentType.HasFlag(PermanentType.Creature);
-        }
+            => PermanentType.HasFlag(PermanentType.Creature);
 
         public bool IsEnchantment()
-        {
-            return PermanentType.HasFlag(PermanentType.Enchantment);
-        }
-        
+            => PermanentType.HasFlag(PermanentType.Enchantment);
+
         public bool IsPlaneswalker()
-        {
-            return PermanentType.HasFlag(PermanentType.Planeswalker);
-        }
+            => PermanentType.HasFlag(PermanentType.Planeswalker);
 
         public bool HasSubType(MTGSubType subType)
-        {
-            return SubType.Contains(subType);
-        }
+            => SubType.Contains(subType);
 
         public bool IsEquipment()
-        {
-            return IsArtifact() && HasSubType(MTGSubType.Equipment);
-        }
+            => IsArtifact() && HasSubType(MTGSubType.Equipment);
 
         public bool IsAura()
-        {
-            return IsEnchantment() && HasSubType(MTGSubType.Aura);
-        }
+            => IsEnchantment() && HasSubType(MTGSubType.Aura);
+
+        public bool HasState(MTGPermanentState state)
+            => State.Contains(state);
+
+        public bool IsTapped()
+            => HasState(MTGPermanentState.Tapped);
+
+        public bool IsUntapped()
+            => !IsTapped();
     }
 }

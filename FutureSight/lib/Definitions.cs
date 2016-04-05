@@ -573,6 +573,16 @@ namespace FutureSight.lib
         Wish,
     }
 
+    public enum MTGPermanentState
+    {
+        Tapped,
+        Attacking,
+        Blocking,
+        Blocked,
+        Destroyed,
+        Summoned,
+    }
+
     public static class EnumTypeHelper
     {
         public static PermanentType GetPermanentType(this CardType ct)
@@ -636,6 +646,7 @@ namespace FutureSight.lib
         }
     }
 
+    [Serializable()]
     public class MTGSubTypeSet
     {
         private List<MTGSubType> subTypeList;
@@ -649,6 +660,7 @@ namespace FutureSight.lib
         public List<MTGSubType> Get { get { return subTypeList; } }
     }
 
+    [Serializable()]
     public class MTGSpecialTypeSet
     {
         private List<MTGSpecialType> specialTypeList;

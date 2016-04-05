@@ -20,7 +20,7 @@ namespace FutureSight.lib
         {
             this.Name = name;
             
-            Definition.CardType = CardDefinition.GetCardType(cardType);
+            Definition.CardType = MTGCardDefinition.GetCardType(cardType);
             Definition.SubType = new MTGSubTypeSet(subType.GetSubTypeList());
             Definition.SpecialType = new MTGSpecialTypeSet(specialType.GetSpecialTypeList());
             Definition.Power = power.ToString();
@@ -117,7 +117,7 @@ namespace FutureSight.lib
         
         public static CardType GetCardType(string cardType)
         {
-            CardType result;
+            CardType result = CardType.Unknown;
             if (cardType.Contains("Artifact")) { result |= CardType.Artifact;  }
             if (cardType.Contains("Creature")) { result |= CardType.Creature; }
             if (cardType.Contains("Enchantment")) { result |= CardType.Enchantment; }
@@ -131,7 +131,7 @@ namespace FutureSight.lib
         
         public static Color GetColorType(string color)
         {
-            Color result;
+            Color result = Color.Colorless;
             if (color.Contains("W")) { result |= Color.White; }
             if (color.Contains("U")) { result |= Color.Blue; }
             if (color.Contains("B")) { result |= Color.Black; }

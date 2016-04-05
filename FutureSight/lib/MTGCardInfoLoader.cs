@@ -11,17 +11,19 @@ namespace FutureSight.lib
 {
     class MTGCardInfoLoader
     {
-        public Dictionary<int, MTGCardDefinition> Database { get; }
-        private Dictionary<int, MTGCard> cardDB;
+        public Dictionary<string, MTGCardDefinition> Database { get; }
+        private Dictionary<string, MTGCard> cardDB;
         private static MTGCardInfoLoader instance;
 
         public static MTGCardInfoLoader GetInstance()
         {
-            if (instance == null)
-            {
-                instance = new MTGCardInfoLoader();
-            }
+            if (instance == null) instance = new MTGCardInfoLoader();
             return instance;
+        }
+
+        public MTGCardInfoLoader()
+        {
+            Database = new Dictionary<string, MTGCardDefinition>();
         }
 
         public void LoadCardDB()
@@ -41,43 +43,45 @@ namespace FutureSight.lib
         {
             try
             {
-                var fileStream = new System.IO.FileStream("CardInfo.csv", FileMode.Open);
-                var streamReader = new System.IO.StreamReader(fileStream);
-                var csvReader = new CsvReader(streamReader);
-                csvReader.Configuration.HasHeaderRecord = true; // Default Value.
-                csvReader.Configuration.RegisterClassMap<CardDefinitionMap>(); 
-                while (csvReader.Read())
+                using (var fileStream = new System.IO.FileStream(".\\resources\\CardInfo.csv", FileMode.Open))
                 {
-                    var rec = csvReader.GetRecord<MTGCardTextField>();
-                    Database.Add(
-                        rec.CardName,
-                        new MTGCardDefiniton(
+                    var streamReader = new System.IO.StreamReader(fileStream);
+                    var csvReader = new CsvReader(streamReader);
+                    csvReader.Configuration.HasHeaderRecord = false; // Default Value.
+                    csvReader.Configuration.RegisterClassMap<CardDefinitionMap>(); 
+                    while (csvReader.Read())
+                    {
+                        var rec = csvReader.GetRecord<MTGCardTextField>();
+                        Database.Add(
                             rec.CardName,
-                            rec.ManaCost,
-                            MTGCardDefinition.GetCardType(rec.CardType),
-                            new MTGSpecialTypeSet(rec.SpecialType),
-                            new MTGSubTypeSet(rec.SubType),
-                            rec.Power,
-                            rec.Toughness,
-                            new List<string>(rec.Ability.Split('|')),
-                            MTGCardDefinition.GetCardType(rec.CardType),
-                            rec.Loyalty,
-                            rec.Expansion,
-                            rec.CollectorNumber,
-                            rec.Illustrator,
-                            rec.FlavorText,
-                            rec.IllustURI,
-                            rec.Flippable,
-                            rec.RefFlippedCardName,
-                            rec.Transformable,
-                            rec.RefTransformedCardName,
-                            rec.Splittable,
-                            rec.RefSplittedCardName
-                        )
-                    );
+                            new MTGCardDefinition(
+                                rec.CardName,
+                                rec.ManaCost,
+                                MTGCardDefinition.GetCardType(rec.CardType),
+                                new MTGSpecialTypeSet(rec.SpecialType),
+                                new MTGSubTypeSet(rec.SubType),
+                                rec.Power,
+                                rec.Toughness,
+                                new List<string>(rec.Ability.Split('|')),
+                                MTGCardDefinition.GetColorType(rec.ColorIndicator),
+                                rec.Loyalty,
+                                rec.Expansion,
+                                rec.CollectorNumber,
+                                rec.Illustrator,
+                                rec.FlavorText,
+                                rec.IllustURI,
+                                rec.Flippable,
+                                rec.RefFlippedCardName,
+                                rec.Transformable,
+                                rec.RefTransformedCardName,
+                                rec.Splittable,
+                                rec.RefSplittedCardName
+                            )
+                        );
+                    }
                 }
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
 #if DEBUG
                 System.Diagnostics.Debug.WriteLine(e.Message);
@@ -89,54 +93,54 @@ namespace FutureSight.lib
     [Serializable()]
     public class MTGCardTextField
     {
-        public string CardName;
-        public string ManaCost;
-        public string CardType;
-        public string SpecialType;
-        public string SubType;
-        public string Power;
-        public string Toughness;
-        public string Ability;
-        public string ColorIndicator;
-        public string Loyalty;
-        public string Expansion;
-        public string CollectorNumber;
-        public string Illustrator;
-        public string FlavorText;
-        public string IllustURI;
-        public string Flippable;
-        public string RefFlippedCardName;
-        public string Transformable;
-        public string RefTransformedCardName;
-        public string Splittable;
-        public string RefSplittedCardName;
+        public string CardName { get; set; }
+        public string ManaCost { get; set; }
+        public string CardType { get; set; }
+        public string SpecialType { get; set; }
+        public string SubType { get; set; }
+        public string Power { get; set; }
+        public string Toughness { get; set; }
+        public string Ability { get; set; }
+        public string ColorIndicator { get; set; }
+        public string Loyalty { get; set; }
+        public string Expansion { get; set; }
+        public string CollectorNumber { get; set; }
+        public string Illustrator { get; set; }
+        public string FlavorText { get; set; }
+        public string IllustURI { get; set; }
+        public string Flippable { get; set; }
+        public string RefFlippedCardName { get; set; }
+        public string Transformable { get; set; }
+        public string RefTransformedCardName { get; set; }
+        public string Splittable { get; set; }
+        public string RefSplittedCardName { get; set; }
     }
     
     public sealed class CardDefinitionMap : CsvClassMap<MTGCardTextField>
     {
         public CardDefinitionMap()
         {
-            Map(m => m.CardName);
-            Map(m => m.ManaCost);
-            Map(m => m.CardType);
-            Map(m => m.SpecialType);
-            Map(m => m.SubType);
-            Map(m => m.Power);
-            Map(m => m.Toughness);
-            Map(m => m.Ability);
-            Map(m => m.ColorIndicator);
-            Map(m => m.Loyalty);
-            Map(m => m.Expansion);
-            Map(m => m.CollectorNumber);
-            Map(m => m.Illustrator);
-            Map(m => m.FlavorText);
-            Map(m => m.IllustURI);
-            Map(m => m.Flippable);
-            Map(m => m.RefFlippedCardName);
-            Map(m => m.Transformable);
-            Map(m => m.RefTransformedCardName);
-            Map(m => m.Splittable);
-            Map(m => m.RefSplittedCardName);
+            Map(m => m.CardName).Index(0);
+            Map(m => m.ManaCost).Index(1);
+            Map(m => m.CardType).Index(2);
+            Map(m => m.SpecialType).Index(3);
+            Map(m => m.SubType).Index(4);
+            Map(m => m.Power).Index(5);
+            Map(m => m.Toughness).Index(6);
+            Map(m => m.Ability).Index(7);
+            Map(m => m.ColorIndicator).Index(8);
+            Map(m => m.Loyalty).Index(9);
+            Map(m => m.Expansion).Index(10);
+            Map(m => m.CollectorNumber).Index(11);
+            Map(m => m.Illustrator).Index(12);
+            Map(m => m.FlavorText).Index(13);
+            Map(m => m.IllustURI).Index(14);
+            Map(m => m.Flippable).Index(15);
+            Map(m => m.RefFlippedCardName).Index(16);
+            Map(m => m.Transformable).Index(17);
+            Map(m => m.RefTransformedCardName).Index(18);
+            Map(m => m.Splittable).Index(19);
+            Map(m => m.RefSplittedCardName).Index(20);
         }
     }
 }

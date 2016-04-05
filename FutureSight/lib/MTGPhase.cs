@@ -7,6 +7,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Security.Cryptography;
 
+using FutureSight.lib.action;
+
 namespace FutureSight.lib
 {
     public enum MTGStep
@@ -57,14 +59,41 @@ namespace FutureSight.lib
                 case MTGStep.Resolve:
                     break;
                 case MTGStep.NextPhase:
+                    ExecuteEndOfPhase(game);
+                    game.Update();
+                    game.NextPhase();
                     break;
             }
         }
         public abstract void ExecuteBeginPhase(GameState game);
+        public abstract void ExecuteEndOfPhase(GameState game);
+
         public MTGPhaseType Type { get { return MTGPhaseType.Null; } }
     }
     
     // ステップ固有処理
+    public class MTGMulligunPhase : MTGPhase
+    {
+        private static MTGPhase instance;
+
+        public static MTGPhase GetInstance()
+        {
+            if (instance == null) { instance = new MTGMulligunPhase(); }
+            return instance;
+        }
+
+        public override void ExecuteBeginPhase(GameState game)
+        {
+            game.Step = MTGStep.NextPhase;
+        }
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+
+        }
+
+        public new MTGPhaseType Type { get { return MTGPhaseType.Mulligan; } }
+    }
+
     public class MTGUntapStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -77,8 +106,28 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+
+        }
+
+        private void Untap(GameState game)
+        {
+            var player = game.GetActivePlayer();
+            foreach (var permanent in player.Permanents)
+            {
+                if (permanent.HasState(MTGPermanentState.Summoned))
+                    game.DoAction(new ChangeStateAction(permanent, MTGPermanentState.Summoned, false));
+
+                if (permanent.IsTapped())
+                {
+                    game.DoAction(new UntapAction(permanent));
+                }
+            }
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.Untap; } }
     }
     
@@ -94,8 +143,12 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.Upkeep; } }
     }
     
@@ -111,8 +164,12 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.Draw; } }
     }
 
@@ -128,8 +185,12 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.FirstMain; } }
     }
 
@@ -145,8 +206,12 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.PreCombat; } }
     }
 
@@ -162,8 +227,12 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.DeclareAttacker; } }
     }
 
@@ -179,8 +248,12 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.DeclareBlocker; } }
     }
 
@@ -195,6 +268,10 @@ namespace FutureSight.lib
         }
         
         public override void ExecuteBeginPhase(GameState game)
+        {
+            game.Step = MTGStep.NextPhase;
+        }
+        public override void ExecuteEndOfPhase(GameState game)
         {
         }
 
@@ -214,8 +291,12 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.EndCombat; } }
     }
 
@@ -231,8 +312,12 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.SecondMain; } }
     }
 
@@ -248,8 +333,12 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.End; } }
     }
 
@@ -265,41 +354,65 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
+            game.Step = MTGStep.NextPhase;
         }
-        
+        public override void ExecuteEndOfPhase(GameState game)
+        {
+        }
+
         public new MTGPhaseType Type { get { return MTGPhaseType.Cleanup; } }
     }
-    
-    public class MTGGamePlayProgression
+
+    public abstract class MTGGamePlay
     {
-        public static MTGPhase NextPhase(GameState game)
+        public abstract MTGPhase GetStartPhase(GameState game);
+        public abstract MTGPhase NextPhase(GameState game);
+    }
+
+    public class MTGDefaultGamePlay : MTGGamePlay
+    {
+        private static MTGDefaultGamePlay instance;
+        public static MTGDefaultGamePlay GetInstance()
+        {
+            if (instance == null) instance = new MTGDefaultGamePlay();
+            return instance;
+        }
+
+        public override MTGPhase GetStartPhase(GameState game)
+        {
+            return MTGMulligunPhase.GetInstance();
+        }
+
+        public override MTGPhase NextPhase(GameState game)
         {
             switch (game.Phase.Type)
             {
-                case MTGPhaseType.Untap:
+                case MTGPhaseType.Mulligan:
                     return MTGUntapStep.GetInstance();
-                case MTGPhaseType.Upkeep:
+                case MTGPhaseType.Untap:
                     return MTGUpkeepStep.GetInstance();
-                case MTGPhaseType.Draw:
+                case MTGPhaseType.Upkeep:
                     return MTGDrawStep.GetInstance();
+                case MTGPhaseType.Draw:
+                    return MTGFirstMainPhase.GetInstance();
                 case MTGPhaseType.FirstMain:
-                    return MTGFirstMainPhase.GetInstance();
+                    return MTGPreCombatStep.GetInstance();
                 case MTGPhaseType.PreCombat:
-                    return MTGFirstMainPhase.GetInstance();
-                case MTGPhaseType.DeclareAttacker:
                     return MTGDeclareAttackerStep.GetInstance();
-                case MTGPhaseType.DeclareBlocker:
+                case MTGPhaseType.DeclareAttacker:
                     return MTGDeclareBlockerStep.GetInstance();
-                case MTGPhaseType.Damage:
+                case MTGPhaseType.DeclareBlocker:
                     return MTGDamageStep.GetInstance();
-                case MTGPhaseType.EndCombat:
+                case MTGPhaseType.Damage:
                     return MTGEndCombatStep.GetInstance();
-                case MTGPhaseType.SecondMain:
+                case MTGPhaseType.EndCombat:
                     return MTGSecondMainPhase.GetInstance();
-                case MTGPhaseType.End:
+                case MTGPhaseType.SecondMain:
                     return MTGEndStep.GetInstance();
-                case MTGPhaseType.Cleanup:
+                case MTGPhaseType.End:
                     return MTGCleanupStep.GetInstance();
+                case MTGPhaseType.Cleanup:
+                    return MTGUntapStep.GetInstance();
             }
             return null;
         }

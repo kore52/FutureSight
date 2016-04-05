@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 namespace FutureSight.lib
 {
     /// イベントに対するアクション定義の基底クラス
-    public class MTGAction
+    public abstract class MTGAction
     {
         private MTGPlayer scorePlayer;
         private int score;
 
         // アクションを行う
-        public virtual void DoAction(GameState game) {}
+        public abstract void DoAction(GameState game);
 
         // アクションを戻す
-        public virtual void UndoAction(GameState game) {}
+        public abstract void UndoAction(GameState game);
 
         // アクションスコアをセット
         public void SetScore(MTGPlayer scorePlayer, int score)

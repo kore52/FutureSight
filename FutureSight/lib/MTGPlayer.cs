@@ -31,16 +31,28 @@ namespace FutureSight.lib
         // マナプール
         public List<int> ManaPool { get; set; }
 
+        // 手札の最大値
+        public int MaximumHandSize { get; set; } = 7;
+
+        // 初期ライフ
+        public int Life { get; private set; } = 20;
+
+        // 敗北する毒カウンターの個数
+        public int LosePoisonCounter { get; private set; } = 10;
+
+        // プレイヤー名
+        public string Name { get; private set; }
+
+        // プレイヤーの持つカウンター
+        public Dictionary<MTGCounterType, int> Counters { get; private set; }
+
         // 対戦相手
         public List<MTGPlayer> Opponents { get; }
 
         // プレイヤーが持つ効果
-        private MTGAbilityType ability;
+        public MTGAbilityType Ability { get; set; } = MTGAbilityType.None;
+
         public GameState CurrentGame { get; set; }
-        public string Name { get; private set; }
-        public int Life { get; private set; } = 20;
-        public Dictionary<MTGCounterType, int> Counters { get; private set; }
-        public int LosePoisonCounter { get; private set; } = 10;
         public long ID
         {
             get
@@ -62,7 +74,7 @@ namespace FutureSight.lib
         public bool CanPlayLand { get { return (maxPlayableLand > countPlayedLand) ? true : false; } }
         private int maxPlayableLand = 1;
         private int countPlayedLand = 0;
-        public bool HasAbility(MTGAbilityType type) { return ability.HasFlag(type);  }
+        public bool HasAbility(MTGAbilityType type) { return Ability.HasFlag(type);  }
 
         public bool IsAI { get; }
         private AI2 ai;
@@ -102,13 +114,41 @@ namespace FutureSight.lib
         }
 
         // プレイヤーの手札とライブラリーを準備
-        public static void PrepareHandAndLibrary(MTGPlayer player, MTGDeck deckList)
+        public static void PrepareHandAndLibrary(MTGPlayer player, MTGDeck deck)
         {
-            // デッキリストの読み込み
+            // ライブラリーの準備
+            player.CreateLibrary(deck);
+
             // シャッフル
+            Utilities.Shuffle(player.Library);
 
-            // InitialHandSizeだけドロー
+            // MaximumHandSizeだけ最初にドロー
+            for (int i = 0; i < player.MaximumHandSize; i++)
+            {
+                if (player.Library.Count != 0)
+                {
+                    var card = player.Library[0];
+                    player.Library.RemoveAt(0);
+                    player.Hand.Add(card);
+                }
+            }
+        }
 
+        /// <summary>
+        /// デッキオブジェクトからライブラリーとサイドボードを作成
+        /// </summary>
+        /// <param name="deck">プレイヤーが使用するデッキ</param>
+        private void CreateLibrary(MTGDeck deck)
+        {
+            foreach (var c in deck.MainDeck)
+            {
+                Library.Add(new MTGCard(c, this));
+            }
+
+            foreach (var c in deck.Sideboard)
+            {
+                Sideboard.Add(new MTGCard(c, this));
+            }
         }
     }
 }

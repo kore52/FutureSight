@@ -10,6 +10,10 @@ namespace FutureSight
 
     class Program
     {
+        static void Initialize()
+        {
+        }
+        
         static void RunDuel()
         {
             var newDuel = new MTGDuel();
@@ -21,6 +25,7 @@ namespace FutureSight
 
         static void Main(string[] args)
         {
+            Initialize();
             RunDuel();
         }
     }

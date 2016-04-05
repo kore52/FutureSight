@@ -22,6 +22,9 @@ namespace FutureSight.lib
             game = GameState.CreateGame(players, me);
             
             // プレイヤーのライブラリーおよび手札の準備
+            MTGPlayer.PrepareHandAndLibrary(me);
+            MTGPlayer.PrepareHandAndLibrary(opponent);
+            
             return game;
         }
     }

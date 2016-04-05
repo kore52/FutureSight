@@ -11,6 +11,10 @@ namespace FutureSight.lib
 {
     class MTGCardInfoLoader
     {
+        public Dictionary<int, MTGCardDefinition> Database { get; }
+        private Dictionary<int, MTGCard> cardDB;
+        private static MTGCardInfoLoader instance;
+
         public static MTGCardInfoLoader GetInstance()
         {
             if (instance == null)
@@ -22,14 +26,14 @@ namespace FutureSight.lib
 
         public void LoadCardDB()
         {
-            cardDB = new Dictionary<int, MTGCard>()
+            cardDB = new Dictionary<string, MTGCard>()
             {
-                { 1, new MTGCard("Plains", "", "Land", "Basic", "Plains", 0, 0, "{T}: add {W}") },
-                { 2, new MTGCard("Island", "", "Land", "Basic", "Island", 0, 0, "{T}: add {U}") },
-                { 3, new MTGCard("Swamp", "", "Land", "Basic", "Swamp", 0, 0, "{T}: add {B}") },
-                { 4, new MTGCard("Mountain", "", "Land", "Basic", "Mountain", 0, 0, "{T}: add {R}") },
-                { 5, new MTGCard("Forest", "", "Land", "Basic", "Forest", 0, 0, "{T}: add {G}") },
-                { 6, new MTGCard("Wondering Ones", "{U}", "Creature", "", "Spirit", 1, 1, "" ) }
+                { "Plains", new MTGCard("Plains", "", "Land", "Basic", "Plains", 0, 0, "{T}: add {W}") },
+                { "Island", new MTGCard("Island", "", "Land", "Basic", "Island", 0, 0, "{T}: add {U}") },
+                { "Swamp", new MTGCard("Swamp", "", "Land", "Basic", "Swamp", 0, 0, "{T}: add {B}") },
+                { "Mountain", new MTGCard("Mountain", "", "Land", "Basic", "Mountain", 0, 0, "{T}: add {R}") },
+                { "Forest", new MTGCard("Forest", "", "Land", "Basic", "Forest", 0, 0, "{T}: add {G}") },
+                { "Wondering Ones", new MTGCard("Wondering Ones", "{U}", "Creature", "", "Spirit", 1, 1, "" ) }
             };
         }
 
@@ -44,9 +48,33 @@ namespace FutureSight.lib
                 csvReader.Configuration.RegisterClassMap<CardDefinitionMap>(); 
                 while (csvReader.Read())
                 {
-                    var rec = csvReader.GetRecord<MTGCardDefiniton>();
-                    int hash = MurMurHash3.Hash(rec.CardName + rec.Expansion + rec.CollectorNumber);
-                    database.Add(hash, new MTGCard());
+                    var rec = csvReader.GetRecord<MTGCardTextField>();
+                    Database.Add(
+                        rec.CardName,
+                        new MTGCardDefiniton(
+                            rec.CardName,
+                            rec.ManaCost,
+                            MTGCardDefinition.GetCardType(rec.CardType),
+                            new MTGSpecialTypeSet(rec.SpecialType),
+                            new MTGSubTypeSet(rec.SubType),
+                            rec.Power,
+                            rec.Toughness,
+                            new List<string>(rec.Ability.Split('|')),
+                            MTGCardDefinition.GetCardType(rec.CardType),
+                            rec.Loyalty,
+                            rec.Expansion,
+                            rec.CollectorNumber,
+                            rec.Illustrator,
+                            rec.FlavorText,
+                            rec.IllustURI,
+                            rec.Flippable,
+                            rec.RefFlippedCardName,
+                            rec.Transformable,
+                            rec.RefTransformedCardName,
+                            rec.Splittable,
+                            rec.RefSplittedCardName
+                        )
+                    );
                 }
             }
             catch (System.Exception e)
@@ -56,27 +84,35 @@ namespace FutureSight.lib
 #endif
             }
         }
-
-        public MTGCard get(int i)
-        {
-            try
-            {
-                return cardDB[i];
-            }
-            catch (Exception)
-            {
-                LoadCardDB();
-                return cardDB[i];
-            }
-        }
-
-        private Dictionary<int, MTGCard> database;
-        private Dictionary<int, MTGCard> cardDB;
-
-        private static MTGCardInfoLoader instance;
     }
 
-    public sealed class CardDefinitionMap : CsvClassMap<MTGCardDefiniton>
+    [Serializable()]
+    public class MTGCardTextField
+    {
+        public string CardName;
+        public string ManaCost;
+        public string CardType;
+        public string SpecialType;
+        public string SubType;
+        public string Power;
+        public string Toughness;
+        public string Ability;
+        public string ColorIndicator;
+        public string Loyalty;
+        public string Expansion;
+        public string CollectorNumber;
+        public string Illustrator;
+        public string FlavorText;
+        public string IllustURI;
+        public string Flippable;
+        public string RefFlippedCardName;
+        public string Transformable;
+        public string RefTransformedCardName;
+        public string Splittable;
+        public string RefSplittedCardName;
+    }
+    
+    public sealed class CardDefinitionMap : CsvClassMap<MTGCardTextField>
     {
         public CardDefinitionMap()
         {

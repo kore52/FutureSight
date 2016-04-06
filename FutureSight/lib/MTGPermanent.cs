@@ -80,6 +80,9 @@ namespace FutureSight.lib
         public bool IsEnchantment()
             => PermanentType.HasFlag(PermanentType.Enchantment);
 
+        public bool IsLand()
+            => PermanentType.HasFlag(PermanentType.Land);
+
         public bool IsPlaneswalker()
             => PermanentType.HasFlag(PermanentType.Planeswalker);
 

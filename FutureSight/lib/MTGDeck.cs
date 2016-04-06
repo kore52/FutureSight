@@ -110,7 +110,6 @@ namespace FutureSight.lib
                         if (matches.Success)
                         {
                             var quantity = int.Parse(matches.Groups["qty"].Value);
-                            //matches.NextMatch();
                             var name = matches.Groups["name"].Value;
                             var srccard = MTGCardInfoLoader.GetInstance().Database[name];
                             var card = (MTGCardDefinition)Utilities.DeepCopy(srccard);
@@ -131,7 +130,7 @@ namespace FutureSight.lib
             }
             catch (Exception e)
             {
-                throw new Exception("Invalid Deck File format.");
+                throw e;
             }
             return deck;
         }

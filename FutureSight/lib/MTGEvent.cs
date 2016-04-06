@@ -52,7 +52,7 @@ namespace FutureSight.lib
 
         public bool HasChoice()
         {
-            return Choice != null;
+            return Choice.IsValid();
         }
 
         /// <summary>
@@ -66,11 +66,4 @@ namespace FutureSight.lib
         }
     }
     
-    interface MTGCost
-    {
-    }
-    
-    public class MTGDrawEvent : MTGEvent
-    {
-    }
 }

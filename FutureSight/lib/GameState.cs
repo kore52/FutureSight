@@ -77,9 +77,7 @@ namespace FutureSight.lib
 
         public LinkedList<MTGEvent> Events { get; set; }
         
-        public bool IsFinished { get { return false; } }
         public List<int> TurnOrder { get; set; }
-        public MTGEvent GetNextEvent() { return eventQueue.First.Value; }
 
         /// <summary>
         /// 現在の盤面の静的評価値
@@ -101,13 +99,13 @@ namespace FutureSight.lib
         // スコアを評価するプレイヤー
         public MTGPlayer ScorePlayer { get; set; }
 
-        /// <summary>
-        /// ターンを行うプレイヤー
-        /// </summary>
+        // ターンを行うプレイヤー
         public MTGPlayer TurnPlayer { get; set; }
-        private LinkedList<MTGEvent> eventQueue;
         
-        // method
+        // 敗北したプレイヤー
+        public MTGPlayer LosingPlayer { get; set; }
+        
+        
         
         public GameState()
         {
@@ -116,8 +114,11 @@ namespace FutureSight.lib
             TurnOrder = new List<int>() { (int)PLAYER._0, (int)PLAYER._1 };
             Players = new List<MTGPlayer>();
             Stack = new LinkedList<string>();
-
             Priority = (int)PLAYER._0;
+            Events = new LinkedList<MTGEvent>();
+            actions = new LinkedList<MTGAction>();
+            delayedActions = new LinkedList<MTGAction>();
+            ChangePhase(MTGDefaultGamePlay.GetInstance().GetStartPhase(this));
         }
 
         // misc
@@ -131,18 +132,15 @@ namespace FutureSight.lib
             return Players[TurnOrder.First()];
         }
 
-
         public void ForwardTurn()
         {
             Turn++;
         }
 
-
         // ゲームの状態を更新する
         public void Update()
         {
             DoDelayedAction();
-
         }
 
         // 状況起因処理
@@ -150,6 +148,7 @@ namespace FutureSight.lib
         private void SetStateCheckRequired(bool flag) { stateCheckFlag = flag; }
         public void SetStateCheckRequired() { stateCheckFlag = true; }
         public bool IsStateCheckRequired { get { return stateCheckFlag; } }
+        
         public void CheckStatePutTriggers()
         {
             // 状況起因処理の必要がなくなるまで繰り返す
@@ -192,6 +191,7 @@ namespace FutureSight.lib
             ChangePhase(MTGDefaultGamePlay.GetInstance().NextPhase(this));
         }
 
+        // ステップ・フェイズの移動
         private void ChangePhase(MTGPhase phase)
         {
             Phase = phase;
@@ -204,6 +204,12 @@ namespace FutureSight.lib
             Phase.ExecutePhase(this);
         }
 
+        public bool IsFinished()
+            => LosingPlayer != null;
+        
+        public bool CanSkipPhase()
+            => Stack.Count == 0;
+        
         // アクションを登録
         public void AddAction(MTGAction action)
         {
@@ -240,6 +246,23 @@ namespace FutureSight.lib
             }
         }
 
+        // 選択が伴う次のイベントまでゲームを進める
+        public bool AdvanceToNextEventWithChoice()
+        {
+            while (!IsFinished())
+            {
+                if (!HasNextEvent())
+                    // イベントが無ければ次のステップに進める
+                    ExecutePhase();
+                else if (!GetNextEvent().HasChoice())
+                    // イベントはあっても選択肢がなければ次のイベントを処理する
+                    ExecuteNextEvent();
+                else
+                    return true;
+            }
+            return false;
+        }
+        
         // イベントを実行
         //  chioceResults: 選択肢がある場合の結果
         public void ExecuteEvent(MTGEvent mtgevent, MTGChoiceResults choiceResults)
@@ -250,18 +273,29 @@ namespace FutureSight.lib
             mtgevent.Execute(this, choiceResults);
         }
 
+        public bool HasNextEvent()
+            => Events.Count != 0;
+        
         // 次のイベントを実行
         // 処理すべきイベントが無くなった段階で呼ばれるメソッド
         public void ExecuteNextEvent(MTGChoiceResults choiceResults)
         {
             DoAction(new ExecuteFirstEventAction(choiceResults));
         }
+        
         // 選択肢が無いバージョン
         public void ExecuteNextEvent()
         {
             DoAction(new ExecuteFirstEventAction(null));
         }
-
+        
+        // イベントキューの先頭のイベントを取得
+        public MTGEvent GetNextEvent()
+        {
+            
+            return Events.First.Value;
+        }
+        
         // プレイヤーリストをAPNAP順で取得
         public List<MTGPlayer> GetAPNAP()
         {
@@ -276,6 +310,11 @@ namespace FutureSight.lib
             game.Players = players;
             game.TurnPlayer = startPlayer;
             return game;
+        }
+        
+        public void Log(MTGPlayer player, string message)
+        {
+            Console.WriteLine("[" + player.Name + "] " + message);
         }
     }
 }

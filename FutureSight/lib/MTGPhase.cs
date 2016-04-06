@@ -7,8 +7,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Security.Cryptography;
 
-using FutureSight.lib.action;
-
 namespace FutureSight.lib
 {
     public enum MTGStep
@@ -52,7 +50,6 @@ namespace FutureSight.lib
                 case MTGStep.ActivePlayer:
                     // 状況起因処理の実行
                     game.CheckStatePutTriggers();
-
                     break;
                 case MTGStep.OtherPlayer:
                     break;
@@ -68,10 +65,14 @@ namespace FutureSight.lib
         public abstract void ExecuteBeginPhase(GameState game);
         public abstract void ExecuteEndOfPhase(GameState game);
 
-        public MTGPhaseType Type { get { return MTGPhaseType.Null; } }
+        public virtual MTGPhaseType Type { get { return MTGPhaseType.Null; } }
     }
     
     // ステップ固有処理
+    
+    /// <summary>
+    /// マリガンステップ
+    /// </summary>
     public class MTGMulligunPhase : MTGPhase
     {
         private static MTGPhase instance;
@@ -91,9 +92,12 @@ namespace FutureSight.lib
 
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.Mulligan; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.Mulligan; } }
     }
 
+    /// <summary>
+    /// アンタップステップ
+    /// </summary>
     public class MTGUntapStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -128,9 +132,12 @@ namespace FutureSight.lib
             }
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.Untap; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.Untap; } }
     }
     
+    /// <summary>
+    /// アップキープステップ
+    /// </summary>
     public class MTGUpkeepStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -143,15 +150,18 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = MTGStep.NextPhase;
+            game.Step = game.CanSkipPhase() ? MTGStep.NextPhase: MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.Upkeep; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.Upkeep; } }
     }
     
+    /// <summary>
+    /// ドローステップ
+    /// </summary>
     public class MTGDrawStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -164,15 +174,28 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = MTGStep.NextPhase;
+            // 103.7a 2人対戦では、先攻のプレイヤーの最初のターンのドロー・ステップを飛ばす
+            if (game.Turn == 1)
+            {
+                game.Step = MTGStep.NextPhase;
+                return;
+            }
+            
+            // ドローアクションを生成
+            game.DoAction(new DrawAction(game.TurnPlayer, 1));
+            
+            game.Step = game.CanSkipPhase() ? MTGStep.NextPhase: MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.Draw; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.Draw; } }
     }
-
+    
+    /// <summary>
+    /// 第一メインフェイズ
+    /// </summary>
     public class MTGFirstMainPhase : MTGPhase
     {
         private static MTGPhase instance;
@@ -191,9 +214,12 @@ namespace FutureSight.lib
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.FirstMain; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.FirstMain; } }
     }
-
+    
+    /// <summary>
+    /// 戦闘開始ステップ
+    /// </summary>
     public class MTGPreCombatStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -212,9 +238,12 @@ namespace FutureSight.lib
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.PreCombat; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.PreCombat; } }
     }
-
+    
+    /// <summary>
+    /// 攻撃クリーチャー指定ステップ
+    /// </summary>
     public class MTGDeclareAttackerStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -233,9 +262,12 @@ namespace FutureSight.lib
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.DeclareAttacker; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.DeclareAttacker; } }
     }
-
+    
+    /// <summary>
+    /// ブロッククリーチャー指定ステップ
+    /// </summary>
     public class MTGDeclareBlockerStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -254,9 +286,12 @@ namespace FutureSight.lib
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.DeclareBlocker; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.DeclareBlocker; } }
     }
-
+    
+    /// <summary>
+    /// 戦闘ダメージステップ
+    /// </summary>
     public class MTGDamageStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -275,10 +310,13 @@ namespace FutureSight.lib
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.Damage; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.Damage; } }
 
     }
-
+    
+    /// <summary>
+    /// 戦闘終了ステップ
+    /// </summary>
     public class MTGEndCombatStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -297,9 +335,12 @@ namespace FutureSight.lib
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.EndCombat; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.EndCombat; } }
     }
-
+    
+    /// <summary>
+    /// 第二メインフェイズ
+    /// </summary>
     public class MTGSecondMainPhase : MTGPhase
     {
         private static MTGPhase instance;
@@ -318,9 +359,12 @@ namespace FutureSight.lib
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.SecondMain; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.SecondMain; } }
     }
-
+    
+    /// <summary>
+    /// 終了ステップ
+    /// </summary>
     public class MTGEndStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -339,9 +383,12 @@ namespace FutureSight.lib
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.End; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.End; } }
     }
-
+    
+    /// <summary>
+    /// クリンナップステップ
+    /// </summary>
     public class MTGCleanupStep : MTGPhase
     {
         private static MTGPhase instance;
@@ -360,7 +407,7 @@ namespace FutureSight.lib
         {
         }
 
-        public new MTGPhaseType Type { get { return MTGPhaseType.Cleanup; } }
+        public override MTGPhaseType Type { get { return MTGPhaseType.Cleanup; } }
     }
 
     public abstract class MTGGamePlay
@@ -385,6 +432,7 @@ namespace FutureSight.lib
 
         public override MTGPhase NextPhase(GameState game)
         {
+            Console.WriteLine(game.Phase.GetType());
             switch (game.Phase.Type)
             {
                 case MTGPhaseType.Mulligan:
@@ -413,6 +461,9 @@ namespace FutureSight.lib
                     return MTGCleanupStep.GetInstance();
                 case MTGPhaseType.Cleanup:
                     return MTGUntapStep.GetInstance();
+                default:
+                    if (game.Phase == null ) throw new Exception("Phase is NULL");
+                    throw new Exception("Invalid Phase Type: " + game.Phase.GetType() + ":" + game.Phase.Type);
             }
             return null;
         }

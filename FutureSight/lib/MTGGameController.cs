@@ -38,10 +38,22 @@ namespace FutureSight.lib
 
         public void RunGame()
         {
-            while (true)
+            while (game.AdvanceToNextEventWithChoice())
             {
-                var mtgEvent = game.GetNextEvent();
+                var nextEvent = game.GetNextEvent();
+                var choiceResults = new MTGChoiceResults();
+                choiceResults.Results = GetAIChoiceResult(nextEvent);
+                Console.WriteLine("Sleep");
+                System.Threading.Thread.Sleep(10000);
+                game.ExecuteNextEvent(choiceResults);
             }
+        }
+        
+        private List<object> GetAIChoiceResult(MTGEvent nextEvent)
+        {
+            var player = nextEvent.Player;
+            var ai = player.GetAI();
+            return ai.FindNextEventChoiceResults(game, player);
         }
     }
 }

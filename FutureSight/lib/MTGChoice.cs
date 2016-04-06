@@ -17,6 +17,16 @@ namespace FutureSight.lib
         {
             return GetOptions(game, mtgevent);
         }
+        
+        public virtual bool IsValid() => true;
+    }
+    
+    public class NoneChoice : MTGChoice
+    {
+        public override MTGChoiceResults GetOptions(GameState game, MTGEvent mtgevent)
+            => new MTGChoiceResults();
+        
+        public override bool IsValid() => false;
     }
 
     public class MTGChoiceResults : IEnumerable<object>

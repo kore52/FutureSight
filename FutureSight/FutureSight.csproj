@@ -47,7 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="lib\action\ChangeStateAction.cs" />
     <Compile Include="lib\AI.cs" />
     <Compile Include="lib\AI2.cs" />
     <Compile Include="lib\MTGCardInfoLoader.cs" />
@@ -69,7 +68,10 @@
     <Compile Include="lib\MurmurHash.cs" />
     <Compile Include="lib\MTGPlayer.cs" />
     <Compile Include="lib\Simulator.cs" />
+    <Compile Include="lib\action\ChangeStateAction.cs" />
+    <Compile Include="lib\action\DrawAction.cs" />
     <Compile Include="lib\action\UntapAction.cs" />
+    <Compile Include="lib\action\LoseGameAction.cs" />
     <Compile Include="lib\Utilities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

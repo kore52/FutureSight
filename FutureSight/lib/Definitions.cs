@@ -116,13 +116,6 @@ namespace FutureSight.lib
         Vanguard = 0x24,
     }
 
-    [Flags]
-    public enum MTGAbilityType
-    {
-        None = 0,
-        Hexproof = 0x00000001
-    }
-
     public enum MTGSubType
     {
         None,
@@ -573,8 +566,19 @@ namespace FutureSight.lib
         Wish,
     }
 
+    public enum MTGPlayerState
+    {
+        None,
+        WinGame,
+        LoseGame,
+        Hexproof,
+        CannotWinGame,
+        CannotLoseGame,
+    }
+
     public enum MTGPermanentState
     {
+        None,
         Tapped,
         Attacking,
         Blocking,

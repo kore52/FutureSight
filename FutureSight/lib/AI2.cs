@@ -45,7 +45,7 @@ namespace FutureSight.lib
             stopWatch = new Stopwatch();
         }
         
-        public List<object> FindNextEventChoiceResults(GameState game)
+        public List<object> FindNextEventChoiceResults(GameState game, MTGPlayer player)
         {
             MTGEvent ev = game.GetNextEvent();
             var scoreBoard = new Dictionary<long, AIScore>();
@@ -134,7 +134,7 @@ namespace FutureSight.lib
             }
             
             // ループを終了する条件はゲームが終了するか、時間をオーバーするか
-            while (!game.IsFinished)
+            while (!game.IsFinished())
             {
                 AIScore bestScore = new AIScore();
                 if (game.Events.Count > 0)

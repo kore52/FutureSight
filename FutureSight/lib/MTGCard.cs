@@ -14,6 +14,7 @@ namespace FutureSight.lib
         public MTGCardDefinition Definition { get; set; }
         public string Name { get { return Definition.CardName; } set { Definition.CardName = Name; } }
         public CardType CardType { get { return Definition.CardType; } set { Definition.CardType = CardType; } }
+        public int Score { get { return int.Parse(Definition.Score); } }
         
         public MTGCard() { }
         public MTGCard(string name, string manaCost, string cardType, string subType, string specialType, int power, int toughness, string effects)
@@ -61,6 +62,7 @@ namespace FutureSight.lib
         public string RefTransformedCardName;
         public string Splittable;
         public string RefSplittedCardName;
+        public string Score;
 
         public MTGCardDefinition()
         {
@@ -90,7 +92,33 @@ namespace FutureSight.lib
             string transformable,
             string refTransformedCardName,
             string splittable,
-            string refSplittedCardName)
+            string refSplittedCardName
+        ) : this(cardName, manaCost, cardType, specialType, subType, power, toughness, ability, colorIndicator, loyalty, expansion, collectorNumber, illustrator, flavorText, illustURI, flippable, refFlippedCardName, transformable, refTransformedCardName, splittable, refSplittedCardName, "1") {}
+        
+        public MTGCardDefinition(
+            string cardName,
+            string manaCost,
+            CardType cardType,
+            MTGSpecialTypeSet specialType,
+            MTGSubTypeSet subType,
+            string power,
+            string toughness,
+            List<string> ability,
+            Color colorIndicator,
+            string loyalty,
+            string expansion,
+            string collectorNumber,
+            string illustrator,
+            string flavorText,
+            string illustURI,
+            string flippable,
+            string refFlippedCardName,
+            string transformable,
+            string refTransformedCardName,
+            string splittable,
+            string refSplittedCardName,
+            string score
+        )
         {
             CardName = cardName;
             ManaCost = manaCost;
@@ -113,6 +141,7 @@ namespace FutureSight.lib
             RefTransformedCardName = refTransformedCardName;
             Splittable = splittable;
             RefSplittedCardName = refSplittedCardName;
+            Score = score;
         }
         
         public static CardType GetCardType(string cardType)
@@ -142,4 +171,22 @@ namespace FutureSight.lib
         }
     }
 
+    public class MTGCardList : List<MTGCard>
+    {
+        public void AddToTop(MTGCard card)
+            => Add(card);
+        
+        public void AddToBottom(MTGCard card)
+            => Insert(0, card);
+        
+        public void RemoveFromTop()
+            => RemoveAt(Count-1);
+        
+        public void RemoveFromBottom()
+            => RemoveAt(0);
+        
+        public bool IsEmpty()
+            => Count == 0;
+        
+    }
 }

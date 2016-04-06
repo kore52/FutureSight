@@ -11,19 +11,19 @@ namespace FutureSight.lib
     public class MTGPlayer : MTGTarget
     {
         // 手札
-        public List<MTGCard> Hand { get; set; }
+        public MTGCardList Hand { get; set; }
 
         // 墓地
-        public List<MTGCard> Graveyard { get; set; }
+        public MTGCardList Graveyard { get; set; }
 
         // 追放領域
-        public List<MTGCard> Exile { get; set; }
+        public MTGCardList Exile { get; set; }
 
         // ライブラリー
-        public List<MTGCard> Library { get; set; }
+        public MTGCardList Library { get; set; }
 
         // サイドボード
-        public List<MTGCard> Sideboard { get; set; }
+        public MTGCardList Sideboard { get; set; }
 
         // コントロールしているパーマネント
         public List<MTGPermanent> Permanents { get; set; }
@@ -49,8 +49,8 @@ namespace FutureSight.lib
         // 対戦相手
         public List<MTGPlayer> Opponents { get; }
 
-        // プレイヤーが持つ効果
-        public MTGAbilityType Ability { get; set; } = MTGAbilityType.None;
+        // プレイヤーの状態
+        public List<MTGPlayerState> State { get; set; }
 
         public GameState CurrentGame { get; set; }
         public long ID
@@ -68,25 +68,25 @@ namespace FutureSight.lib
                 return id;
             }
         }
-        public bool IsWin { get; private set; } = false;
-        public bool IsLose { get; private set; } = false;
-        public bool IsEmptyDraw { get; private set; } = false;
+
         public bool CanPlayLand { get { return (maxPlayableLand > countPlayedLand) ? true : false; } }
         private int maxPlayableLand = 1;
         private int countPlayedLand = 0;
-        public bool HasAbility(MTGAbilityType type) { return Ability.HasFlag(type);  }
+        public bool HasState(MTGPlayerState type) { return State.Contains(type);  }
 
         public bool IsAI { get; }
+        public AI2 GetAI() => ai;
         private AI2 ai;
 
         public MTGPlayer()
         {
-            Hand = new List<MTGCard>();
-            Graveyard = new List<MTGCard>();
-            Exile = new List<MTGCard>();
-            Library = new List<MTGCard>();
-            Sideboard = new List<MTGCard>();
+            Hand = new MTGCardList();
+            Graveyard = new MTGCardList();
+            Exile = new MTGCardList();
+            Library = new MTGCardList();
+            Sideboard = new MTGCardList();
             Permanents = new List<MTGPermanent>();
+            State = new List<MTGPlayerState>();
             ManaPool = new List<int>() { 0, 0, 0, 0, 0, 0 };
             Counters = new Dictionary<MTGCounterType, int>();
         }
@@ -150,5 +150,8 @@ namespace FutureSight.lib
                 Sideboard.Add(new MTGCard(c, this));
             }
         }
+        
+        public bool IsLoseGame()
+            => State.Contains(MTGPlayerState.LoseGame);
     }
 }

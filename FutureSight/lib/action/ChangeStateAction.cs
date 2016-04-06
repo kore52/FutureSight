@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FutureSight.lib.action
+namespace FutureSight.lib
 {
     public class ChangeStateAction : MTGAction
     {

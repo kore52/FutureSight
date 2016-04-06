@@ -121,6 +121,13 @@ namespace FutureSight.lib
             ChangePhase(MTGDefaultGamePlay.GetInstance().GetStartPhase(this));
         }
 
+        public GameState(List<MTGPlayer> players, MTGPlayer startPlayer) : this()
+        {
+            Players = players;
+            ScorePlayer = startPlayer;
+            TurnPlayer = startPlayer;
+        }
+
         // misc
         public int GetActivePlayerNumber()
         {
@@ -306,9 +313,7 @@ namespace FutureSight.lib
         
         public static GameState CreateGame(List<MTGPlayer> players, MTGPlayer startPlayer)
         {
-            var game = new GameState();
-            game.Players = players;
-            game.TurnPlayer = startPlayer;
+            var game = new GameState(players, startPlayer);
             return game;
         }
         

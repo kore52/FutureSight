@@ -16,6 +16,7 @@ namespace FutureSight.lib
         {
             this.player = player;
             this.amount = amount;
+            this.drawnCards = new List<MTGCard>();
         }
 
         // アクションを行う

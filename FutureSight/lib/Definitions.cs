@@ -564,6 +564,8 @@ namespace FutureSight.lib
         Winch,
         Wind,
         Wish,
+
+        MaxValue
     }
 
     public enum MTGPlayerState

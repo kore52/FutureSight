@@ -17,7 +17,6 @@ namespace FutureSight.lib
         }
         
         private MTGPlayer player;
-        private MTGPlayer oldLosingPlayer;
         private LoseGameReason reason;
 
         public LoseGameAction(MTGPlayer player, LoseGameReason reason)
@@ -38,6 +37,7 @@ namespace FutureSight.lib
         // アクションを戻す
         public override void UndoAction(GameState game)
         {
+            player.State.Remove(MTGPlayerState.LoseGame);
         }
     }
 }

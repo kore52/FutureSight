@@ -44,7 +44,8 @@ namespace FutureSight.lib
         public string Name { get; private set; }
 
         // プレイヤーの持つカウンター
-        public Dictionary<MTGCounterType, int> Counters { get; private set; }
+        private Dictionary<MTGCounterType, int> Counters;
+        public int GetCounters(MTGCounterType type) => Counters.GetValue(type, 0);
 
         // 対戦相手
         public List<MTGPlayer> Opponents { get; }
@@ -59,7 +60,7 @@ namespace FutureSight.lib
             {
                 long id = 0;
                 id += (long)Life              * 1000000000;
-                id += (long)Counters[MTGCounterType.Poison]  * 100000000;
+                id += (long)GetCounters(MTGCounterType.Poison)  * 100000000;
                 id += (long)Hand.Count        * 1000000;
                 id += (long)Permanents.Count  * 10000;
                 id += (long)Graveyard.Count   * 1000;
@@ -107,7 +108,7 @@ namespace FutureSight.lib
                 // TODO
             }
 
-            if (Counters[MTGCounterType.Poison] >= LosePoisonCounter)
+            if (GetCounters(MTGCounterType.Poison) >= LosePoisonCounter)
             {
                 // TODO
             }

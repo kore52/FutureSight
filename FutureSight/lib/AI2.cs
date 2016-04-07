@@ -47,6 +47,8 @@ namespace FutureSight.lib
         
         public List<object> FindNextEventChoiceResults(GameState game, MTGPlayer player)
         {
+            game.Log(player, "FindNextEventChoiceResults");
+            
             MTGEvent ev = game.GetNextEvent();
             var scoreBoard = new Dictionary<long, AIScore>();
             

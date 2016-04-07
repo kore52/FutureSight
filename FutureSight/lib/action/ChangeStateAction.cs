@@ -10,23 +10,29 @@ namespace FutureSight.lib
     {
         private MTGPermanent Permanent;
         private MTGPermanentState State;
-        private bool Set;
+        private bool IsSet;
         private bool Changed;
 
+        /// <summary>
+        /// パーマネントの状態を変更するアクション
+        /// </summary>
+        /// <param name="permanent">対象パーマネント</param>
+        /// <param name="state">変更対象の状態</param>
+        /// <param name="isSet">True:設定, False:解除</param>
         public ChangeStateAction(MTGPermanent permanent, MTGPermanentState state, bool isSet)
         {
             Permanent = permanent;
             State = state;
-            Set = isSet;
+            IsSet = isSet;
         }
 
         // アクションを行う
         public override void DoAction(GameState game)
         {
-            Changed = Permanent.HasState(State) != Set;
+            Changed = Permanent.HasState(State) != IsSet;
             if (Changed)
             {
-                if (Set)
+                if (IsSet)
                 {
                     Permanent.State.Add(State);
                 }
@@ -50,5 +56,21 @@ namespace FutureSight.lib
                 Permanent.State.Add(State);
             }
         }
+        
+        /// <summary>
+        /// パーマネントに状態をセット
+        /// </summary>
+        /// <param name="permanent">対象パーマネント</param>
+        /// <param name="state">変更対象の状態</param>
+        public static ChangeStateAction Set(MTGPermanent permanent, MTGPermanentState state)
+            => new ChangeStateAction(permanent, state, true);
+        
+        /// <summary>
+        /// パーマネントの状態をクリア
+        /// </summary>
+        /// <param name="permanent">対象パーマネント</param>
+        /// <param name="state">変更対象の状態</param>
+        public static ChangeStateAction Clear(MTGPermanent permanent, MTGPermanentState state)
+            => new ChangeStateAction(permanent, state, false);
     }
 }

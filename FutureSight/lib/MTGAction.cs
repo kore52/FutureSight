@@ -29,8 +29,6 @@ namespace FutureSight.lib
         // アクションを行うプレイヤーが評価するプレイヤーと同じであればプラス、対戦相手であればマイナス
         public int GetScore(MTGPlayer player)
         {
-            Console.WriteLine(scorePlayer == null);
-            Console.WriteLine(player == null);
             return (player.ID == scorePlayer.ID) ? score : -score;
         }
     }

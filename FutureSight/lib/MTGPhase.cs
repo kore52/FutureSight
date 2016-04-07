@@ -120,15 +120,16 @@ namespace FutureSight.lib
         private void Untap(GameState game)
         {
             var player = game.GetActivePlayer();
+            game.Log(player, "untap");
             foreach (var permanent in player.Permanents)
             {
+                // 召還酔いの解除
                 if (permanent.HasState(MTGPermanentState.Summoned))
-                    game.DoAction(new ChangeStateAction(permanent, MTGPermanentState.Summoned, false));
-
+                    game.DoAction(ChangeStateAction.Clear(permanent, MTGPermanentState.Summoned));
+                
+                // アンタップ
                 if (permanent.IsTapped())
-                {
                     game.DoAction(new UntapAction(permanent));
-                }
             }
         }
 

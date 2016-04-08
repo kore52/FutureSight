@@ -24,36 +24,44 @@ namespace FutureSight.lib
         public MTGChoice Choice { get; private set; }
 
         /// <summary>
-        /// イベントの対象プレイヤー・パーマネント
+        /// イベントの対象プレイヤー・パーマネント・カード
         /// </summary>
-        public MTGTarget Target { get; private set; }
+        public List<MTGTarget> Targets { get; private set; }
+        
+        /// <summary>
+        /// イベントの発生源
+        /// </summary>
+        public MTGSource Source { get; private set; }
 
         /// <summary>
         /// イベントのアクション
         /// </summary>
         public MTGEventAction Action { get; private set; }
 
-        public MTGEvent()
+        public MTGEvent() { }
+
+        public MTGEvent(MTGSource source, MTGPlayer player, List<MTGTarget> targets, MTGChoice choice, MTGEventAction action)
         {
+            Source = source;
+            Player = player;
+            Targets = targets;
+            Choice = choice;
+            Action = action;
             
+            Console.WriteLine("AddEvent: " + this.GetType().ToString());
         }
 
-        public MTGEvent(MTGPlayer player, MTGTarget target, MTGEventAction action)
-        {
-            Player = player;
-            Target = target;
-            Action = action;
-        }
+        public MTGEvent(MTGPlayer player, List<MTGTarget> targets, MTGChoice choice, MTGEventAction action)
+            : this(null, player, targets, choice, action) {}
+
+        public MTGEvent(MTGPlayer player, List<MTGTarget> targets, MTGEventAction action)
+            : this(null, player, targets, null, action) {}
 
         public void Execute(GameState game, MTGChoiceResults choiceResults)
-        {
-            Action.ExecuteEvent(game, this);
-        }
+            => Action.ExecuteEvent(game, this);
 
         public bool HasChoice()
-        {
-            return Choice.IsValid();
-        }
+            => Choice.IsValid();
 
         /// <summary>
         /// イベント選択肢の結果を配列で返す。

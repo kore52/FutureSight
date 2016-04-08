@@ -42,24 +42,27 @@ namespace FutureSight.lib
         {
             switch (game.Step)
             {
-                case MTGStep.Begin:
-                    // ステップ固有処理の実行
-                    ExecuteBeginPhase(game);
-                    game.Update();
-                    break;
-                case MTGStep.ActivePlayer:
-                    // 状況起因処理の実行
-                    game.CheckStatePutTriggers();
-                    break;
-                case MTGStep.OtherPlayer:
-                    break;
-                case MTGStep.Resolve:
-                    break;
-                case MTGStep.NextPhase:
-                    ExecuteEndOfPhase(game);
-                    game.Update();
-                    game.NextPhase();
-                    break;
+            case MTGStep.Begin:
+                // ステップ固有処理の実行
+                ExecuteBeginPhase(game);
+                game.Update();
+                break;
+            case MTGStep.ActivePlayer:
+                // 状況起因処理の実行
+                game.CheckStatePutTriggers();
+                game.AddEvent(new TakePriorityEvent(game.TurnPlayer));
+                break;
+            case MTGStep.OtherPlayer:
+                game.CheckStatePutTriggers();
+                game.AddEvent(new TakePriorityEvent(game.TurnPlayer.Opponents[0]));
+                break;
+            case MTGStep.Resolve:
+                break;
+            case MTGStep.NextPhase:
+                ExecuteEndOfPhase(game);
+                game.Update();
+                game.NextPhase();
+                break;
             }
         }
         public abstract void ExecuteBeginPhase(GameState game);
@@ -151,7 +154,7 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = game.CanSkipPhase() ? MTGStep.NextPhase: MTGStep.ActivePlayer;
+            game.Step = game.CanSkipPhase() ? MTGStep.NextPhase : MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
@@ -185,7 +188,7 @@ namespace FutureSight.lib
             // ドローアクションを生成
             game.DoAction(new DrawAction(game.TurnPlayer, 1));
             
-            game.Step = game.CanSkipPhase() ? MTGStep.NextPhase: MTGStep.ActivePlayer;
+            game.Step = game.CanSkipPhase() ? MTGStep.NextPhase : MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
@@ -209,7 +212,7 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = MTGStep.NextPhase;
+            game.Step = MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
@@ -257,7 +260,7 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = MTGStep.NextPhase;
+            game.Step = MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
@@ -281,7 +284,7 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = MTGStep.NextPhase;
+            game.Step = MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
@@ -305,7 +308,7 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = MTGStep.NextPhase;
+            game.Step = MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
@@ -330,7 +333,7 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = MTGStep.NextPhase;
+            game.Step = MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
@@ -354,7 +357,7 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = MTGStep.NextPhase;
+            game.Step = MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
@@ -378,7 +381,7 @@ namespace FutureSight.lib
         
         public override void ExecuteBeginPhase(GameState game)
         {
-            game.Step = MTGStep.NextPhase;
+            game.Step = MTGStep.ActivePlayer;
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
@@ -406,6 +409,8 @@ namespace FutureSight.lib
         }
         public override void ExecuteEndOfPhase(GameState game)
         {
+            game.Turn++;
+            Console.WriteLine("Turn : "+game.Turn);
         }
 
         public override MTGPhaseType Type { get { return MTGPhaseType.Cleanup; } }

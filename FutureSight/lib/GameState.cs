@@ -75,7 +75,7 @@ namespace FutureSight.lib
         private LinkedList<MTGAction> actions;
         private LinkedList<MTGAction> delayedActions;
 
-        public LinkedList<MTGEvent> Events { get; set; }
+        public MTGEventQueue Events { get; set; }
         
         public List<int> TurnOrder { get; set; }
 
@@ -109,13 +109,13 @@ namespace FutureSight.lib
         
         public GameState()
         {
-            Turn = 0;
+            Turn = 1;
             Score = 0;
             TurnOrder = new List<int>() { (int)PLAYER._0, (int)PLAYER._1 };
             Players = new List<MTGPlayer>();
             Stack = new LinkedList<string>();
             Priority = (int)PLAYER._0;
-            Events = new LinkedList<MTGEvent>();
+            Events = new MTGEventQueue();
             actions = new LinkedList<MTGAction>();
             delayedActions = new LinkedList<MTGAction>();
             ChangePhase(MTGDefaultGamePlay.GetInstance().GetStartPhase(this));
@@ -226,6 +226,8 @@ namespace FutureSight.lib
         // アクションを実行
         public void DoAction(MTGAction action)
         {
+            Log(ScorePlayer, action.GetType().ToString());
+            
             // 行ったアクションを記録
             actions.AddLast(action);
 
@@ -270,16 +272,23 @@ namespace FutureSight.lib
             return false;
         }
         
+        /// <summary>
+        /// イベントの追加
+        /// </summary>
+        public void AddEvent(MTGEvent aEvent)
+            => DoAction(new AddEventAction(aEvent));
+        
         // イベントを実行
         //  chioceResults: 選択肢がある場合の結果
-        public void ExecuteEvent(MTGEvent mtgevent, MTGChoiceResults choiceResults)
+        public void ExecuteEvent(MTGEvent aEvent, MTGChoiceResults choiceResults)
         {
             System.Diagnostics.Debug.Assert(choiceResults != null);
 
             // 渡されたイベントオブジェクト毎に異なるイベントを実行
-            mtgevent.Execute(this, choiceResults);
+            aEvent.Execute(this, choiceResults);
         }
-
+        
+        // イベントキューに次のイベントがあるか
         public bool HasNextEvent()
             => Events.Count != 0;
         
@@ -290,6 +299,7 @@ namespace FutureSight.lib
             DoAction(new ExecuteFirstEventAction(choiceResults));
         }
         
+        // 次のイベントを実行
         // 選択肢が無いバージョン
         public void ExecuteNextEvent()
         {
@@ -300,7 +310,7 @@ namespace FutureSight.lib
         public MTGEvent GetNextEvent()
         {
             
-            return Events.First.Value;
+            return Events.First;
         }
         
         // プレイヤーリストをAPNAP順で取得

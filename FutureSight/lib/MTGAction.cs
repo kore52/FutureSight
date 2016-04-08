@@ -28,9 +28,10 @@ namespace FutureSight.lib
         // アクションに対するスコアを取得
         // アクションを行うプレイヤーが評価するプレイヤーと同じであればプラス、対戦相手であればマイナス
         public int GetScore(MTGPlayer player)
-        {
-            return (player.ID == scorePlayer.ID) ? score : -score;
-        }
+            => (player.ID == scorePlayer.ID) ? score : -score;
+        
+        public MTGPlayer GetScorePlayer()
+            => scorePlayer;
     }
 
     /// プレイヤーが土地をプレイするアクション
@@ -81,7 +82,7 @@ namespace FutureSight.lib
 
         public override void DoAction(GameState game)
         {
-            firstEvent = game.Events.First.Value;
+            firstEvent = game.Events.First;
             game.ExecuteEvent(firstEvent, choiceResults);
         }
 

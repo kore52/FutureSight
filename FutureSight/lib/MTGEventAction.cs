@@ -8,7 +8,7 @@ namespace FutureSight.lib
 {
     public class MTGEventAction
     {
-        public void ExecuteEvent(GameState game, MTGEvent mtgevent) { }
+        public void ExecuteEvent(MTGGame game, MTGEvent mtgevent) { }
 
         public static MTGEventAction NONE;
 

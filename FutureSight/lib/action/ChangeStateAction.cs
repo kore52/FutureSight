@@ -27,7 +27,7 @@ namespace FutureSight.lib
         }
 
         // アクションを行う
-        public override void DoAction(GameState game)
+        public override void DoAction(MTGGame game)
         {
             Changed = Permanent.HasState(State) != IsSet;
             if (Changed)
@@ -45,7 +45,7 @@ namespace FutureSight.lib
         }
 
         // アクションを戻す
-        public override void UndoAction(GameState game)
+        public override void UndoAction(MTGGame game)
         {
             if (Changed)
             {

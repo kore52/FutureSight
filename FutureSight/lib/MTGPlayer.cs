@@ -53,7 +53,7 @@ namespace FutureSight.lib
         // ƒvƒŒƒCƒ„[‚Ìó‘Ô
         public List<MTGPlayerState> State { get; set; }
 
-        public GameState CurrentGame { get; set; }
+        public MTGGame CurrentGame { get; set; }
         public long ID
         {
             get

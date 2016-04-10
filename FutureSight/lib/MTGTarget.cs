@@ -17,7 +17,7 @@ namespace FutureSight.lib
             targetType = type;
         }
 
-        public List<MTGTarget> GetLegalTargets(GameState game)
+        public List<MTGTarget> GetLegalTargets(MTGGame game)
         {
             return new List<MTGTarget>();
         }
@@ -36,7 +36,7 @@ namespace FutureSight.lib
     {
         public MTGPlayerTarget() : base("MTGPlayerTarget") {}
 
-        public new List<MTGTarget> GetLegalTargets(GameState game)
+        public new List<MTGTarget> GetLegalTargets(MTGGame game)
         {
             var results = new List<MTGTarget>();
             foreach(var player in game.Players)

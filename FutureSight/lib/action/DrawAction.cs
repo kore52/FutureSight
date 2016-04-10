@@ -20,7 +20,7 @@ namespace FutureSight.lib
         }
 
         // アクションを行う
-        public override void DoAction(GameState game)
+        public override void DoAction(MTGGame game)
         {
             int score = 0;
             for (int i = 0; i < amount; i++)
@@ -45,7 +45,7 @@ namespace FutureSight.lib
         }
 
         // アクションを戻す
-        public override void UndoAction(GameState game)
+        public override void UndoAction(MTGGame game)
         {
             for (int i = drawnCards.Count-1; i < 0; i--)
             {

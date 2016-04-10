@@ -18,7 +18,7 @@ namespace FutureSight.lib
     {
         public static readonly int[] scoreByPermanentType = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         // 評価関数
-        public static int evaluate(GameState state)
+        public static int evaluate(MTGGame state)
         {
             int score = 0;
 

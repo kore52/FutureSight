@@ -38,14 +38,14 @@ namespace FutureSight.lib
     public class AI2
     {
         private Stopwatch stopWatch;
-        private Dictionary<int, GameState> scoreBoard;
+        private Dictionary<int, MTGGame> scoreBoard;
 
         public AI2()
         {
             stopWatch = new Stopwatch();
         }
         
-        public List<object> FindNextEventChoiceResults(GameState game, MTGPlayer player)
+        public List<object> FindNextEventChoiceResults(MTGGame game, MTGPlayer player)
         {
             game.Log(player, "FindNextEventChoiceResults");
             
@@ -60,7 +60,7 @@ namespace FutureSight.lib
                 var achoice = new MTGChoiceResults(choice);
                 aiChoiceResults.Add(achoice);
                 
-                GameState copiedGame = (GameState)Utilities.DeepCopy(game);
+                MTGGame copiedGame = (MTGGame)Utilities.DeepCopy(game);
                 
                 // TODO : multi threading
                 {
@@ -85,11 +85,11 @@ namespace FutureSight.lib
     public class AIWorker
     {
         private int id;
-        private GameState game;
+        private MTGGame game;
         private Dictionary<long, AIScore> scoreBoard;
         private Stopwatch stopWatch;
 
-        public AIWorker(int id, GameState game, Dictionary<long, AIScore> scoreBoard)
+        public AIWorker(int id, MTGGame game, Dictionary<long, AIScore> scoreBoard)
         {
             this.id = id;
             this.game = game;

@@ -9,9 +9,9 @@ namespace FutureSight.lib
     public class MTGDuel
     {
         private int numDuels;
-        private GameState game;
+        private MTGGame game;
         
-        public GameState PrepareNextGame()
+        public MTGGame PrepareNextGame()
         {
             // プレイヤーの作成
             MTGPlayer me = new MTGPlayer(20, 10, true);
@@ -19,7 +19,7 @@ namespace FutureSight.lib
             List<MTGPlayer> players = new List<MTGPlayer>() { me, opponent };
 
             // ゲームの作成
-            game = GameState.CreateGame(players, me);
+            game = MTGGame.CreateGame(players, me);
             
             // プレイヤーのライブラリーおよび手札の準備
             MTGPlayer.PrepareHandAndLibrary(me, DeckLoader.GetInstance().LoadFromFile("resources\\deck1.txt"));

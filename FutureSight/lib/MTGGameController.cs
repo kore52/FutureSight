@@ -11,10 +11,10 @@ namespace FutureSight.lib
     
     public class SinglePlayGameController : IGameController
     {
-        private GameState game;
+        private MTGGame game;
         private int maxTime;
         
-        public SinglePlayGameController(GameState game, int maxTime)
+        public SinglePlayGameController(MTGGame game, int maxTime)
         {
             this.game = game;
             this.maxTime = maxTime;
@@ -27,10 +27,10 @@ namespace FutureSight.lib
 
     public class AutoPlayGameController : IGameController
     {
-        private GameState game;
+        private MTGGame game;
         private int maxTime;
 
-        public AutoPlayGameController(GameState game, int maxTime)
+        public AutoPlayGameController(MTGGame game, int maxTime)
         {
             this.game = game;
             this.maxTime = maxTime;

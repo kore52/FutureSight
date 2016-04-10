@@ -43,7 +43,7 @@ namespace FutureSight.lib
     }
 
     [Serializable()]
-    public class GameState
+    public class MTGGame
     {
         /// <summary>
         /// プレイヤー
@@ -94,7 +94,7 @@ namespace FutureSight.lib
                 return id;
             }
         }
-        public List<GameState> MoveNode { get; set; }
+        public List<MTGGame> MoveNode { get; set; }
 
         // スコアを評価するプレイヤー
         public MTGPlayer ScorePlayer { get; set; }
@@ -107,7 +107,7 @@ namespace FutureSight.lib
         
         
         
-        public GameState()
+        public MTGGame()
         {
             Turn = 1;
             Score = 0;
@@ -121,7 +121,7 @@ namespace FutureSight.lib
             ChangePhase(MTGDefaultGamePlay.GetInstance().GetStartPhase(this));
         }
 
-        public GameState(List<MTGPlayer> players, MTGPlayer startPlayer) : this()
+        public MTGGame(List<MTGPlayer> players, MTGPlayer startPlayer) : this()
         {
             Players = players;
             ScorePlayer = startPlayer;
@@ -321,9 +321,9 @@ namespace FutureSight.lib
             return ret;
         }
         
-        public static GameState CreateGame(List<MTGPlayer> players, MTGPlayer startPlayer)
+        public static MTGGame CreateGame(List<MTGPlayer> players, MTGPlayer startPlayer)
         {
-            var game = new GameState(players, startPlayer);
+            var game = new MTGGame(players, startPlayer);
             return game;
         }
         

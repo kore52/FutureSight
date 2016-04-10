@@ -28,14 +28,14 @@ namespace FutureSight.lib
         public LoseGameAction(MTGPlayer player) : this(player, LoseGameReason.Life) { }
 
         // アクションを行う
-        public override void DoAction(GameState game)
+        public override void DoAction(MTGGame game)
         {
             player.State.Add(MTGPlayerState.LoseGame);
             game.Log(player, reason.ToString());
         }
 
         // アクションを戻す
-        public override void UndoAction(GameState game)
+        public override void UndoAction(MTGGame game)
         {
             player.State.Remove(MTGPlayerState.LoseGame);
         }

@@ -16,13 +16,13 @@ namespace FutureSight.lib
         }
 
         // アクションを行う
-        public override void DoAction(GameState game)
+        public override void DoAction(MTGGame game)
         {
             game.Events.AddLast(aEvent);
         }
 
         // アクションを戻す
-        public override void UndoAction(GameState game)
+        public override void UndoAction(MTGGame game)
         {
             game.Events.RemoveLast();
         }

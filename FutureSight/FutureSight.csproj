@@ -53,7 +53,7 @@
     <Compile Include="lib\MTGCard.cs" />
     <Compile Include="lib\Definitions.cs" />
     <Compile Include="lib\Evaluate.cs" />
-    <Compile Include="lib\GameState.cs" />
+    <Compile Include="lib\MTGGame.cs" />
     <Compile Include="lib\MTGAction.cs" />
     <Compile Include="lib\MTGChoice.cs" />
     <Compile Include="lib\MTGDeck.cs" />
@@ -63,6 +63,7 @@
     <Compile Include="lib\MTGGameController.cs" />
     <Compile Include="lib\MTGPermanent.cs" />
     <Compile Include="lib\MTGPhase.cs" />
+    <Compile Include="lib\MTGPlayChoiceResult.cs" />
     <Compile Include="lib\MTGTarget.cs" />
     <Compile Include="lib\MTGTrigger.cs" />
     <Compile Include="lib\MurmurHash.cs" />

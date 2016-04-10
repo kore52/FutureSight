@@ -23,6 +23,11 @@ namespace FutureSight.lib
         /// </summary>
         public MTGChoice Choice { get; private set; }
 
+        public MTGPlayChoiceResult GetPlayChoice()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// イベントの対象プレイヤー・パーマネント・カード
         /// </summary>
@@ -57,7 +62,7 @@ namespace FutureSight.lib
         public MTGEvent(MTGPlayer player, List<MTGTarget> targets, MTGEventAction action)
             : this(null, player, targets, null, action) {}
 
-        public void Execute(GameState game, MTGChoiceResults choiceResults)
+        public void Execute(MTGGame game, MTGChoiceResults choiceResults)
             => Action.ExecuteEvent(game, this);
 
         public bool HasChoice()
@@ -68,7 +73,7 @@ namespace FutureSight.lib
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        public MTGChoiceResults GetChoiceResults(GameState game)
+        public MTGChoiceResults GetChoiceResults(MTGGame game)
         {
             return Choice.GetChoiceResults(game, this);
         }

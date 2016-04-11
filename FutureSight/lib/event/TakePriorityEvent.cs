@@ -23,7 +23,7 @@ namespace FutureSight.lib
                 var playChoice = aEvent.Chosen;
                 
                 // 行動の選択肢が「優先権のパス」であれば、優先権を持つプレイヤーを変更
-                if (playChoice.IsEquals(MTGPlayChoiceResult.Pass))
+                if (playChoice.Equals(MTGPlayChoiceResult.Pass))
                 {
                     // どのプレイヤーも優先権をパスしたなら効果の解決
                     if (game.PriorityPassed)

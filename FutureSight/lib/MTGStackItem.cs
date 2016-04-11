@@ -11,7 +11,7 @@ namespace FutureSight.lib
         MTGTarget Target;
         MTGEvent Event;
         MTGActivation Activation;
-        MTGChoiceResult ChoiceResult;
+        MTGChoiceResults ChoiceResult;
         
         public MTGStackItem(MTGSource source, MTGPlayer controller, MTGTarget target, MTGEvent aEvent, MTGActivation activation)
         {

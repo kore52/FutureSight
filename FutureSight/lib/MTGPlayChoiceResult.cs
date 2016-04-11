@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace FutureSight.lib
 {
-    public class MTGSourceActivation { }
+    public class MTGSourceActivation : MTGActivation { }
     public class MTGPlayChoiceResult
     {
         private MTGSourceActivation sourceActivation;

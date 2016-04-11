@@ -9,13 +9,14 @@ namespace FutureSight.lib
 {
     public abstract class MTGChoice
     {
-        // カードの効果によって異なる選択肢の結果を返すメソッド(なのでList<object>)
-        //   プレイヤー・パーマネント・色・状態・投票・数
-        public abstract MTGChoiceResults GetOptions(MTGGame game, MTGEvent mtgevent);
+        /// <summary>
+        /// AI向けの選択肢一覧を返す仮想メソッド
+        /// </summary>
+        public abstract MTGChoiceResults GetAIOptions(MTGGame game, MTGEvent mtgevent);
 
         public MTGChoiceResults GetChoiceResults(MTGGame game, MTGEvent mtgevent)
         {
-            return GetOptions(game, mtgevent);
+            return GetAIOptions(game, mtgevent);
         }
         
         public virtual bool IsValid() => true;
@@ -23,7 +24,7 @@ namespace FutureSight.lib
     
     public class NoneChoice : MTGChoice
     {
-        public override MTGChoiceResults GetOptions(MTGGame game, MTGEvent mtgevent)
+        public override MTGChoiceResults GetAIOptions(MTGGame game, MTGEvent mtgevent)
             => new MTGChoiceResults();
         
         public override bool IsValid() => false;
@@ -78,7 +79,7 @@ namespace FutureSight.lib
 
     public class MTGCardChoice : MTGChoice
     {
-        public override MTGChoiceResults GetOptions(MTGGame state, MTGEvent aEvent)
+        public override MTGChoiceResults GetAIOptions(MTGGame state, MTGEvent aEvent)
         {
             var choiceResultList = new MTGChoiceResults();
             var player = state.Players[0];

@@ -1,7 +1,5 @@
 
-    マジックのカードやスタック上の呪文などの効果をオブジェクトに分割したもの
-
-    event
+event
     spell or ability
         mode
         choice : 1, 2
@@ -17,7 +15,8 @@
         choice
         effect
         list of action
-        action
+        event action
+          action
             actiontype: etb, pig, exile, put onto top of library, etc...
                     look, draw, discard, tap, untap, add mana, pay mana, deal damage, prevent damage,
                     put any counters onto
@@ -25,3 +24,27 @@
                     copy
                     cast
             choice
+
+set active player
+  get priority
+    choose play card
+      get event
+        choose target
+        pay mana cost
+        pay other cost
+        put onto stack
+          if priority passed
+            change priority-----
+          else  choose play card
+    priority passed
+      change priority--
+
+event
+  source
+    eventaction
+      action
+    eventaction
+      action
+  activation
+    cost
+    

@@ -6,9 +6,18 @@ using System.Text;
 
 namespace FutureSight.lib
 {
-    public class MTGSource
+    public class MTGSource : MTGObject
     {
+        public MTGPlayer Controller { get; set; }
+        
         public MTGSource() {}
+        public MTGSource(MTGPlayer controller)
+        {
+            Controller = controller;
+        }
+        
+        public bool IsController(MTGPlayer player)
+          => Controller.Equals(player);
         
     }
 }

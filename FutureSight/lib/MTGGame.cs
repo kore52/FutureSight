@@ -53,7 +53,7 @@ namespace FutureSight.lib
         /// <summary>
         /// 領域:スタック
         /// </summary>
-        public LinkedList<string> Stack { get; set; }
+        public LinkedList<MTGStackItem> Stack { get; set; }
 
         /// <summary>
         /// 優先権を持つプレイヤーID
@@ -69,14 +69,13 @@ namespace FutureSight.lib
         /// フェイズ・ステップ中の状態を持つ（アクティブプレイヤー、解決中など）
         /// </summary>
         public MTGStep Step { get; set; }
-
         public int Turn { get; set; }
 
         private LinkedList<MTGAction> actions;
         private LinkedList<MTGAction> delayedActions;
 
         public MTGEventQueue Events { get; set; }
-        
+        public bool PriorityPassed { get; private set; }
         public List<int> TurnOrder { get; set; }
 
         /// <summary>
@@ -149,7 +148,14 @@ namespace FutureSight.lib
         {
             DoDelayedAction();
         }
-
+        
+        // 効果の解決
+        public void Resolve()
+        {
+            if (Stack.Count == 0)
+                Step = MTGStep.Resolve;
+        }
+        
         // 状況起因処理
         private bool stateCheckFlag = false;
         private void SetStateCheckRequired(bool flag) { stateCheckFlag = flag; }
@@ -285,7 +291,7 @@ namespace FutureSight.lib
             System.Diagnostics.Debug.Assert(choiceResults != null);
 
             // 渡されたイベントオブジェクト毎に異なるイベントを実行
-            aEvent.Execute(this, choiceResults);
+            aEvent.ExecuteEvent(this, choiceResults);
         }
         
         // イベントキューに次のイベントがあるか
@@ -331,5 +337,8 @@ namespace FutureSight.lib
         {
             Console.WriteLine("[" + player.Name + "] " + message);
         }
+        
+        public void SetPriorityPassed() => PriorityPassed = true;
+        public void ClearPriorityPassed() => PriorityPassed = false;
     }
 }

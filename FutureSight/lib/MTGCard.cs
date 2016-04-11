@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FutureSight.lib
 {
     [Serializable()]
-    public class MTGCard
+    public class MTGCard : MTGSource
     {
         public MTGPlayer Owner { get; set; }
         public MTGCardDefinition Definition { get; set; }

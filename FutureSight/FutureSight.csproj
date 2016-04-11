@@ -69,15 +69,21 @@
     <Compile Include="lib\MurmurHash.cs" />
     <Compile Include="lib\MTGPlayer.cs" />
     <Compile Include="lib\MTGSource.cs" />
+    <Compile Include="lib\MTGActivation.cs" />
+    <Compile Include="lib\MTGStackItem.cs" />
     <Compile Include="lib\Simulator.cs" />
     <Compile Include="lib\action\AddEventAction.cs" />
     <Compile Include="lib\action\ChangeStateAction.cs" />
     <Compile Include="lib\action\DrawAction.cs" />
     <Compile Include="lib\action\UntapAction.cs" />
     <Compile Include="lib\action\LoseGameAction.cs" />
+    <Compile Include="lib\action\TapAction.cs" />
+    <Compile Include="lib\action\ResolveStackAction.cs" />
     <Compile Include="lib\Utilities.cs" />
+    <Compile Include="lib\MTGObject.cs"/>
     <Compile Include="lib\MTGCollections.cs" />
     <Compile Include="lib\event\TakePriorityEvent.cs" />
+    <Compile Include="lib\event\TapEvent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

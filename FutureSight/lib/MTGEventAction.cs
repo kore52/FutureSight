@@ -8,13 +8,18 @@ namespace FutureSight.lib
 {
     public class MTGEventAction
     {
-        public void ExecuteEvent(MTGGame game, MTGEvent mtgevent) { }
-
-        public static MTGEventAction NONE;
-
+        public Action<MTGGame, MTGEvent> ExecuteEvent;
+        
+        public MTGEventAction(Action<MTGGame, MTGEvent> action)
+        {
+            ExecuteEvent = action;
+        }
+        
+        // 何もしないアクション
+        public static MTGEventAction None;
         static MTGEventAction()
         {
-            NONE = new MTGEventAction();
+            None = new MTGEventAction((MTGGame game, MTGEvent aEvent) => {});
         }
     }
 }

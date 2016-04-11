@@ -11,21 +11,61 @@ namespace FutureSight.lib
 {
     public class TakePriorityEvent : MTGEvent
     {
-        public TakePriorityEvent(MTGPlayer player) : base(null, player, null, null, null) { }
-
-
-        public void EventAction(MTGGame game, MTGEvent aEvent)
+        public TakePriorityEvent(MTGPlayer player)
+            : base(null, player, null, null, EventAction) { }
+        
+        public static MTGEventAction EventAction;
+        
+        static TakePriorityEvent()
         {
-            switch (game.Step)
+            EventAction = new MTGEventAction((MTGGame game, MTGEvent aEvent) =>
             {
-                case MTGStep.ActivePlayer:
-                    game.Step = MTGStep.OtherPlayer;
-                    break;
-                case MTGStep.OtherPlayer:
-                    game.Step = MTGStep.ActivePlayer;
-                    break;
-            }
-
+                var playChoice = aEvent.Chosen;
+                
+                // 行動の選択肢が「優先権のパス」であれば、優先権を持つプレイヤーを変更
+                if (playChoice.IsEquals(MTGPlayChoiceResult.Pass))
+                {
+                    // どのプレイヤーも優先権をパスしたなら効果の解決
+                    if (game.PriorityPassed)
+                    {
+                        game.ClearPriorityPassed();
+                        game.Resolve();
+                    }
+                    else
+                    {
+                        // 優先権の変更
+                        game.SetPriorityPassed();
+                        switch (game.Step)
+                        {
+                            case MTGStep.ActivePlayer:
+                                game.Step = MTGStep.OtherPlayer;
+                                break;
+                            case MTGStep.OtherPlayer:
+                                game.Step = MTGStep.ActivePlayer;
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    // 選択を用いないコストの支払い: {T}:等
+                    foreach (var costEvent in playChoice.CostEvent)
+                    {
+                        if (!costEvent.HasChoice())
+                            game.ExecuteEvent(costEvent);
+                    }
+                    
+                    // 選択を用いるコストの支払い: マナコスト等
+                    foreach (var costEvent in playChoice.CostEvent)
+                    {
+                        if (costEvent.HasChoice())
+                            game.ExecuteEvent(costEvent);
+                    }
+                    
+                    // 選択した行動の実行
+                    game.AddEvent(playChoice.Event);
+                }
+            });
         }
     }
 }

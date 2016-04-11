@@ -42,9 +42,18 @@ namespace FutureSight.lib
         /// イベントのアクション
         /// </summary>
         public MTGEventAction Action { get; private set; }
-
+        
+        /// <summary>
+        /// イベントで取り得る選択肢一覧
+        /// イベント実行中は値を保持する(イベントが終わるとnullクリア)
+        ///   例：対象のクリーチャーの場合 -> クリーチャー一覧がリストに存在する
+        /// </summary>
+        public MTGChoiceResults Chosen { get; private set; }
+        public MTGTarget ChosenTarget { get; private set; }
+        
+        
+        
         public MTGEvent() { }
-
         public MTGEvent(MTGSource source, MTGPlayer player, List<MTGTarget> targets, MTGChoice choice, MTGEventAction action)
         {
             Source = source;
@@ -62,8 +71,17 @@ namespace FutureSight.lib
         public MTGEvent(MTGPlayer player, List<MTGTarget> targets, MTGEventAction action)
             : this(null, player, targets, null, action) {}
 
-        public void Execute(MTGGame game, MTGChoiceResults choiceResults)
-            => Action.ExecuteEvent(game, this);
+        public MTGEvent(MTGSource source, MTGEventAction action)
+            : this(source, source.Controller, null, null, action) {}
+
+        public void ExecuteEvent(MTGGame game, MTGChoiceResults choiceResults)
+        {
+            Chosen = choiceResults;
+            ChosenTarget = GetLegalTarget(game, Chosen);
+            Action.ExecuteEvent(game, this); // delegation
+            Chosen = null;
+            ChosenTarget = null;
+        }
 
         public bool HasChoice()
             => Choice.IsValid();
@@ -77,6 +95,20 @@ namespace FutureSight.lib
         {
             return Choice.GetChoiceResults(game, this);
         }
+        
+        private MTGTarget GetLegalTarget(MTGGame game, MTGChoiceResults chosen)
+        {
+            foreach (var target in chosen)
+                if (target is MTGTarget)
+                    return GetLegalTarget(game, target);
+            return null;
+        }
+        
+        private MTGTarget GetLegalTarget(MTGGame game, MTGTarget target)
+        {
+            return target;
+        }
+        
     }
     
 }

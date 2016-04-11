@@ -57,6 +57,9 @@ namespace FutureSight.lib
                 game.AddEvent(new TakePriorityEvent(game.TurnPlayer.Opponents[0]));
                 break;
             case MTGStep.Resolve:
+                if (game.Stack.Count == 0)
+                game.DoAction(new ResolveStackAction());
+                game.Step = MTGPhase.ActivePlayer;
                 break;
             case MTGStep.NextPhase:
                 ExecuteEndOfPhase(game);

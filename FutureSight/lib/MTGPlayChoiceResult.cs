@@ -9,7 +9,7 @@ namespace FutureSight.lib
     {
         private MTGSourceActivation sourceActivation;
 
-        public MTGPlayChoiceResult(object aSourceActivation)
+        public MTGPlayChoiceResult(MTGSourceActivation aSourceActivation)
         {
             sourceActivation = aSourceActivation;
         }

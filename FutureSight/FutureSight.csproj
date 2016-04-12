@@ -37,7 +37,7 @@
       <HintPath>..\packages\CsvHelper.2.13.5.0\lib\net40-client\CsvHelper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Sprache, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+    <Reference Include="Sprache, Version=2.0.0.51, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sprache.2.0.0.51\lib\portable-net4+netcore45+win8+wp8+sl5+MonoAndroid+Xamarin.iOS10+MonoTouch\Sprache.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -57,10 +57,12 @@
     <Compile Include="lib\MTGCard.cs" />
     <Compile Include="lib\Definitions.cs" />
     <Compile Include="lib\Evaluate.cs" />
+    <Compile Include="lib\MTGCost.cs" />
     <Compile Include="lib\MTGGame.cs" />
     <Compile Include="lib\MTGAction.cs" />
     <Compile Include="lib\MTGActivation.cs" />
-    <Compile Include="lib\MTGActivationBuilder.cs" />
+    <Compile Include="lib\MTGManaSymbolList.cs" />
+    <Compile Include="lib\MTGRuleTextParser.cs" />
     <Compile Include="lib\MTGChoice.cs" />
     <Compile Include="lib\MTGDeck.cs" />
     <Compile Include="lib\MTGDuel.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="lib\MTGPlayer.cs" />
     <Compile Include="lib\MTGSource.cs" />
     <Compile Include="lib\MTGStackItem.cs" />
+    <Compile Include="lib\action\ProduceManaAction.cs" />
     <Compile Include="lib\Simulator.cs" />
     <Compile Include="lib\action\AddEventAction.cs" />
     <Compile Include="lib\action\ChangeStateAction.cs" />

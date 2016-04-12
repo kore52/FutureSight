@@ -25,7 +25,7 @@ namespace FutureSight.lib
         public override MTGChoiceResults GetAIOptions(MTGGame game, MTGEvent aEvent)
         {
             var options = new MTGChoiceResults();
-            options.Add(MTGPlayChoice.Pass);
+            options.Add(MTGPlayChoiceResult.Pass);
             foreach (var act in aEvent.Player.GetPlayableActivations())
                 options.Add(act);
 

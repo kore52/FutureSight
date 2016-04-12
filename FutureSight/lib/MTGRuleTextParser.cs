@@ -8,62 +8,87 @@ using Sprache;
 
 namespace FutureSight.lib
 {
-    public class MTGActivationBuilder
+    public class MTGRuleTextParser
     {
         public static readonly Parser<char> Colon = Parse.Char(':'); // 起動型能力の区切り
+
         public static readonly Parser<char> Comma = Parse.Char(','); // コストの区切り
+
         public static readonly Parser<string> TapSymbol = Parse.String("{T}").Text();
-        public static readonly Parser<string> WhiteManaSymbol =
+
+        public static readonly Parser<MTGManaSymbol> WhiteManaSymbol =
             from start in Parse.Char('{')
             from white in Parse.String("W").Text()
             from end in Parse.Char('}')
-            select white;
-        public static readonly Parser<string> BlueManaSymbol =
+            select new MTGManaSymbol(white);
+
+        public static readonly Parser<MTGManaSymbol> BlueManaSymbol =
             from start in Parse.Char('{')
             from blue in Parse.String("U").Text()
             from end in Parse.Char('}')
-            select blue;
-        public static readonly Parser<string> BlackManaSymbol =
+            select new MTGManaSymbol(blue);
+
+        public static readonly Parser<MTGManaSymbol> BlackManaSymbol =
             from start in Parse.Char('{')
             from black in Parse.String("B").Text()
             from end in Parse.Char('}')
-            select black;
-        public static readonly Parser<string> RedManaSymbol =
+            select new MTGManaSymbol(black);
+
+        public static readonly Parser<MTGManaSymbol> RedManaSymbol =
             from start in Parse.Char('{')
             from red in Parse.String("R").Text()
             from end in Parse.Char('}')
-            select red;
-        public static readonly Parser<string> GreenManaSymbol =
+            select new MTGManaSymbol(red);
+
+        public static readonly Parser<MTGManaSymbol> GreenManaSymbol =
             from start in Parse.Char('{')
             from green in Parse.String("G").Text()
             from end in Parse.Char('}')
-            select green;
-        public static readonly Parser<string> ManaSymbol =
-            from mana in WhiteManaSymbol.Text()
-            .Or(BlueManaSymbol.Text())
-            .Or(BlackManaSymbol.Text())
-            .Or(RedManaSymbol.Text())
-            .Or(GreenManaSymbol.Text())
+            select new MTGManaSymbol(green);
+
+        public static readonly Parser<MTGManaSymbol> ColorlessManaSymbol =
+            from start in Parse.Char('{')
+            from colorless in Parse.String("C").Text()
+            from end in Parse.Char('}')
+            select new MTGManaSymbol(colorless);
+
+        public static readonly Parser<MTGManaSymbol> GenericManaSymbol =
+            from start in Parse.Char('{')
+            from generic in Parse.Number.Text()
+            from end in Parse.Char('}')
+            select new MTGManaSymbol(generic);
+
+        public static readonly Parser<MTGManaSymbol> XManaSymbol =
+            from start in Parse.Char('{')
+            from x in Parse.String("X").Text()
+            from end in Parse.Char('}')
+            select new MTGManaSymbol(x);
+
+        public static readonly Parser<MTGManaSymbol> ManaSymbolGrammer =
+            from mana in WhiteManaSymbol
+                .Or(BlueManaSymbol)
+                .Or(BlackManaSymbol)
+                .Or(RedManaSymbol)
+                .Or(GreenManaSymbol)
+                .Or(GenericManaSymbol)
+                .Or(XManaSymbol)
             select mana;
-        public static readonly Parser<string> AddToYourManaPool =
-            from _1 in Parse.String("Add").Token().Text()
-            from mana in ManaSymbol
-            from _2 in Parse.String("to your mana pool.").Token().Text()
-            select mana;
-        
-        public static readonly Parser<string> Cost =
-        from tapsymbol in TapSymbol.Many().Token().Text()
-        from c in Comma.Many().Token().Text()
-        from manasymbol in ManaSymbol.Many().Token().Text()
-        from c in Comma.Many().Token().Text()
-        from 
-        
-        public static readonly Parser<MTGActivation> ActivationAbility =
-        from cost in TapSymbol.Token().Text()
-        from 
+
+        public static readonly Parser<List<MTGCost>> Cost =
+            from mana in ManaSymbolGrammer.Many()
+            from tap in TapSymbol
+            from behavior in Parse.Letter.Many()
+            select new List<MTGCost>() { new MTGManaCost(mana), new MTGTapCost(), new MTGBehaviorCost(string.Concat(behavior)) };
 
 
-        private static MTGActivationBuilder instance;
+        public static readonly Parser<MTGActivation> AddManaActivationGrammer =
+            from costList in Cost
+            from _a in Parse.String("Add").Token().Text()
+            from mana in ManaSymbolGrammer.Many()
+            from _b in Parse.String("to your mana pool.").Token().Text()
+            select new AddManaActivation(costList, AddManaType.Controller, new MTGManaSymbolList(mana));
+
+        private static MTGRuleTextParser instance;
         
         
         public List<MTGActivation> Build(string activationString)
@@ -79,9 +104,8 @@ namespace FutureSight.lib
         
         private MTGActivation ParserActivation(string activation)
         {
-            
-            //var activation = 
-            return new MTGActivaton();
+            var result = ActivationAbility.Parse(activation);
+            return result;
         }
         
         private MTGActivation ParseActivateAbility(MatchCollection matches)
@@ -89,9 +113,9 @@ namespace FutureSight.lib
             return new MTGActivation();
         }
         
-        public static MTGActivationBuilder GetInstance()
+        public static MTGRuleTextParser GetInstance()
         {
-            if (instance == null) instance = new MTGActivationBuilder();
+            if (instance == null) instance = new MTGRuleTextParser();
             return instance;
         }
     }

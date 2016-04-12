@@ -99,7 +99,20 @@ namespace FutureSight.lib
             IsAI = isAI;
             if (isAI) { ai = new AI2(); }
         }
-
+        
+        /// <summary>
+        /// 手札、墓地、パーマネントからプレイや起動が可能な能力一覧を取得する
+        /// </summary>
+        public List<MTGSource> GetPlayableActivations()
+        {
+            var acts = new List<MTGSource>();
+//            var acts = Hand.Select(card => card.CanPlay()).
+            foreach (var card in Hand) acts.AddRange(card.GetActivations());
+            foreach (var card in Graveyard) acts.AddRange(card.GetActivations());
+            foreach (var card in Permanents) acts.AddRange(card.GetActivations());
+            return acts;
+        }
+        
         // プレイヤーの状況起因処理（敗北チェック）
         public void GenerateStateBasedActions()
         {

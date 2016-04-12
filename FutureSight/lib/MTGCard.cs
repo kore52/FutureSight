@@ -14,6 +14,7 @@ namespace FutureSight.lib
         public MTGCardDefinition Definition { get; set; }
         public string Name { get { return Definition.CardName; } set { Definition.CardName = Name; } }
         public CardType CardType { get { return Definition.CardType; } set { Definition.CardType = CardType; } }
+        public List<MTGActivation> Activations { get; private set; }
         public int Score { get { return int.Parse(Definition.Score); } }
         
         public MTGCard() { }
@@ -103,7 +104,7 @@ namespace FutureSight.lib
             MTGSubTypeSet subType,
             string power,
             string toughness,
-            List<string> ability,
+            List<MTGActivation> ability,
             Color colorIndicator,
             string loyalty,
             string expansion,
@@ -187,6 +188,5 @@ namespace FutureSight.lib
         
         public bool IsEmpty()
             => Count == 0;
-        
     }
 }

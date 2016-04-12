@@ -24,7 +24,10 @@ namespace FutureSight.lib
         /// <returns>行動候補一覧</returns>
         public override MTGChoiceResults GetAIOptions(MTGGame game, MTGEvent aEvent)
         {
-            MTGChoiceResults choiceResult = new MTGChoiceResults();
+            var options = new MTGChoiceResults();
+            options.Add(MTGPlayChoice.Pass);
+            foreach (var act in aEvent.Player.GetPlayableActivations())
+                options.Add(act);
 
             return PassOptions;
         }

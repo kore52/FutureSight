@@ -11,8 +11,8 @@ namespace FutureSight.lib
 {
     public class TapEvent : MTGEvent
     {
-        public TapEvent(MTGPlayer player)
-            : base(null, player, null, null, EventAction) { }
+        public TapEvent(MTGPermanent permanent)
+            : base(permanent, EventAction, "Tap SN.") { }
         
         public static MTGEventAction EventAction;
         
@@ -20,7 +20,7 @@ namespace FutureSight.lib
         {
             EventAction = new MTGEventAction((MTGGame game, MTGEvent aEvent) =>
             {
-                game.DoAction(new TapAction(aEvent.GetPermanent));
+                game.DoAction(new TapAction(aEvent.Permanent));
             });
         }
     }

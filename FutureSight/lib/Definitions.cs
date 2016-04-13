@@ -69,7 +69,22 @@ namespace FutureSight.lib
         // Snow-Covered land mana
         Snow,
 
-        Generic,
+        Generic1,
+        Generic2,
+        Generic3,
+        Generic4,
+        Generic5,
+        Generic6,
+        Generic7,
+        Generic8,
+        Generic9,
+        Generic10,
+        Generic11,
+        Generic12,
+        Generic13,
+        Generic14,
+        Generic15,
+        GenericX,
 
         Null
     }

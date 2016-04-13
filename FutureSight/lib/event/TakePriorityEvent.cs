@@ -12,7 +12,7 @@ namespace FutureSight.lib
     public class TakePriorityEvent : MTGEvent
     {
         public TakePriorityEvent(MTGPlayer player)
-            : base(null, player, null, null, EventAction) { }
+            : base(null, player, null, null, EventAction, "Take priority") { }
         
         public static MTGEventAction EventAction;
         
@@ -20,10 +20,10 @@ namespace FutureSight.lib
         {
             EventAction = new MTGEventAction((MTGGame game, MTGEvent aEvent) =>
             {
-                var playChoice = aEvent.Chosen;
+                var playChoiceResult = aEvent.Chosen;
                 
                 // 行動の選択肢が「優先権のパス」であれば、優先権を持つプレイヤーを変更
-                if (playChoice.Equals(MTGPlayChoiceResult.Pass))
+                if (playChoiceResult.Equals(MTGPlayChoiceResult.Pass))
                 {
                     // どのプレイヤーも優先権をパスしたなら効果の解決
                     if (game.PriorityPassed)
@@ -49,21 +49,21 @@ namespace FutureSight.lib
                 else
                 {
                     // 選択を用いないコストの支払い: {T}:等
-                    foreach (var costEvent in playChoice.CostEvent)
+                    foreach (var costEvent in playChoiceResult.SourceActivation.CostEvent)
                     {
                         if (!costEvent.HasChoice())
                             game.ExecuteEvent(costEvent);
                     }
                     
                     // 選択を用いるコストの支払い: マナコスト等
-                    foreach (var costEvent in playChoice.CostEvent)
+                    foreach (var costEvent in playChoiceResult.SourceActivation.CostEvent)
                     {
                         if (costEvent.HasChoice())
                             game.ExecuteEvent(costEvent);
                     }
                     
                     // 選択した行動の実行
-                    game.AddEvent(playChoice.Event);
+                    game.AddEvent(playChoiceResult.Event);
                 }
             });
         }

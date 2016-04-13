@@ -12,16 +12,16 @@ namespace FutureSight.lib
 
     public class MTGManaCost : MTGCost
     {
-        private List<MTGManaSymbol> ManaCost;
+        private List<MTGManaType> ManaCost;
 
-        public MTGManaCost(List<MTGManaSymbol> manaCost)
+        public MTGManaCost(List<MTGManaType> manaCost)
         {
             ManaCost = manaCost;
         }
 
-        public MTGManaCost(IEnumerable<MTGManaSymbol> mana)
+        public MTGManaCost(IEnumerable<MTGManaType> mana)
         {
-            ManaCost = new List<MTGManaSymbol>();
+            ManaCost = new List<MTGManaType>();
             foreach(var m in mana)
                 ManaCost.Add(m);
         }

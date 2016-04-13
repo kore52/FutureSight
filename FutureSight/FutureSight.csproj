@@ -61,7 +61,8 @@
     <Compile Include="lib\MTGGame.cs" />
     <Compile Include="lib\MTGAction.cs" />
     <Compile Include="lib\MTGActivation.cs" />
-    <Compile Include="lib\MTGManaSymbolList.cs" />
+    <Compile Include="lib\MTGManaActivation.cs" />
+    <Compile Include="lib\MTGManaType.cs" />
     <Compile Include="lib\MTGRuleTextParser.cs" />
     <Compile Include="lib\MTGChoice.cs" />
     <Compile Include="lib\MTGDeck.cs" />
@@ -79,8 +80,7 @@
     <Compile Include="lib\MTGPlayer.cs" />
     <Compile Include="lib\MTGSource.cs" />
     <Compile Include="lib\MTGStackItem.cs" />
-    <Compile Include="lib\action\ProduceManaAction.cs" />
-    <Compile Include="lib\Simulator.cs" />
+    <Compile Include="lib\action\AddManaAction.cs" />
     <Compile Include="lib\action\AddEventAction.cs" />
     <Compile Include="lib\action\ChangeStateAction.cs" />
     <Compile Include="lib\action\DrawAction.cs" />

@@ -14,57 +14,57 @@ namespace FutureSight.lib
 
         public static readonly Parser<char> Comma = Parse.Char(','); // コストの区切り
 
-        public static readonly Parser<string> TapSymbol = Parse.String("{T}").Text();
+        public static readonly Parser<string> TapSymbol = Parse.String("{T}").Token().Text();
 
-        public static readonly Parser<MTGManaSymbol> WhiteManaSymbol =
+        public static readonly Parser<MTGManaType> WhiteManaSymbol =
             from start in Parse.Char('{')
             from white in Parse.String("W").Text()
             from end in Parse.Char('}')
-            select new MTGManaSymbol(white);
+            select new MTGManaType(white);
 
-        public static readonly Parser<MTGManaSymbol> BlueManaSymbol =
+        public static readonly Parser<MTGManaType> BlueManaSymbol =
             from start in Parse.Char('{')
             from blue in Parse.String("U").Text()
             from end in Parse.Char('}')
-            select new MTGManaSymbol(blue);
+            select new MTGManaType(blue);
 
-        public static readonly Parser<MTGManaSymbol> BlackManaSymbol =
+        public static readonly Parser<MTGManaType> BlackManaSymbol =
             from start in Parse.Char('{')
             from black in Parse.String("B").Text()
             from end in Parse.Char('}')
-            select new MTGManaSymbol(black);
+            select new MTGManaType(black);
 
-        public static readonly Parser<MTGManaSymbol> RedManaSymbol =
+        public static readonly Parser<MTGManaType> RedManaSymbol =
             from start in Parse.Char('{')
             from red in Parse.String("R").Text()
             from end in Parse.Char('}')
-            select new MTGManaSymbol(red);
+            select new MTGManaType(red);
 
-        public static readonly Parser<MTGManaSymbol> GreenManaSymbol =
+        public static readonly Parser<MTGManaType> GreenManaSymbol =
             from start in Parse.Char('{')
             from green in Parse.String("G").Text()
             from end in Parse.Char('}')
-            select new MTGManaSymbol(green);
+            select new MTGManaType(green);
 
-        public static readonly Parser<MTGManaSymbol> ColorlessManaSymbol =
+        public static readonly Parser<MTGManaType> ColorlessManaSymbol =
             from start in Parse.Char('{')
             from colorless in Parse.String("C").Text()
             from end in Parse.Char('}')
-            select new MTGManaSymbol(colorless);
+            select new MTGManaType(colorless);
 
-        public static readonly Parser<MTGManaSymbol> GenericManaSymbol =
+        public static readonly Parser<MTGManaType> GenericManaSymbol =
             from start in Parse.Char('{')
             from generic in Parse.Number.Text()
             from end in Parse.Char('}')
-            select new MTGManaSymbol(generic);
+            select new MTGManaType(generic);
 
-        public static readonly Parser<MTGManaSymbol> XManaSymbol =
+        public static readonly Parser<MTGManaType> XManaSymbol =
             from start in Parse.Char('{')
             from x in Parse.String("X").Text()
             from end in Parse.Char('}')
-            select new MTGManaSymbol(x);
+            select new MTGManaType(x);
 
-        public static readonly Parser<MTGManaSymbol> ManaSymbolGrammer =
+        public static readonly Parser<MTGManaType> ManaSymbolGrammer =
             from mana in WhiteManaSymbol
                 .Or(BlueManaSymbol)
                 .Or(BlackManaSymbol)
@@ -74,22 +74,19 @@ namespace FutureSight.lib
                 .Or(XManaSymbol)
             select mana;
 
-        public static readonly Parser<List<MTGCost>> Cost =
+        // {T} : Add {X} to your mana pool.
+        public static readonly Parser<MTGManaActivation> TapAddManaActivation = 
+            from cost in TapSymbol
+            from _ in Colon
+            from _add in Parse.String("Add").Token().Text()
             from mana in ManaSymbolGrammer.Many()
-            from tap in TapSymbol
-            from behavior in Parse.Letter.Many()
-            select new List<MTGCost>() { new MTGManaCost(mana), new MTGTapCost(), new MTGBehaviorCost(string.Concat(behavior)) };
+            from _tymp in Parse.String("to your mana pool.").Token().Text()
+            select new MTGManaActivation(MTGManaActivation.Create(cost, new List<MTGManaType>(mana.ToList())));
 
-
-        public static readonly Parser<MTGActivation> AddManaActivationGrammer =
-            from costList in Cost
-            from _a in Parse.String("Add").Token().Text()
-            from mana in ManaSymbolGrammer.Many()
-            from _b in Parse.String("to your mana pool.").Token().Text()
-            select new AddManaActivation(costList, AddManaType.Controller, new MTGManaSymbolList(mana));
-
-        private static MTGRuleTextParser instance;
-        
+        public static readonly object[] ParseList =
+            {
+                TapAddManaActivation
+            };
         
         public List<MTGActivation> Build(string activationString)
         {
@@ -108,49 +105,11 @@ namespace FutureSight.lib
             return result;
         }
         
-        private MTGActivation ParseActivateAbility(MatchCollection matches)
-        {
-            return new MTGActivation();
-        }
-        
+        private static MTGRuleTextParser instance;
         public static MTGRuleTextParser GetInstance()
         {
             if (instance == null) instance = new MTGRuleTextParser();
             return instance;
-        }
-    }
-    
-    
-    public class MTGManaSymbol
-    {
-        public ManaSymbol Type { get; private set; }
-        public MTGManaSymbol(string letter)
-        {
-            switch (letter)
-            {
-            case "W":
-            case "w":
-                Type = ManaSymbol.White;
-                break;
-            case "U":
-            case "u":
-                Type = ManaSymbol.Blue;
-                break;
-            case "B":
-            case "b":
-                Type = ManaSymbol.Black;
-                break;
-            case "R":
-            case "r":
-                Type = ManaSymbol.Red;
-                break;
-            case "G":
-            case "g":
-                Type = ManaSymbol.Green;
-                break;
-            default:
-                throw new Exception("Invalid Mana Symbol");
-            }
         }
     }
 }

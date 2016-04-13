@@ -35,7 +35,6 @@ namespace FutureSight.lib
             Definition = def;
             Owner = owner;
         }
-        
     }
 
 
@@ -64,6 +63,11 @@ namespace FutureSight.lib
         public string Splittable;
         public string RefSplittedCardName;
         public string Score;
+        
+        public List<MTGManaActivation> ManaActivations;
+        public List<MTGActivation> HandActivations;
+        public List<MTGActivation> GraveyardActivations;
+        public List<MTGActivation> ExileActivation;
 
         public MTGCardDefinition()
         {
@@ -104,7 +108,7 @@ namespace FutureSight.lib
             MTGSubTypeSet subType,
             string power,
             string toughness,
-            List<MTGActivation> ability,
+            List<string> ability,
             Color colorIndicator,
             string loyalty,
             string expansion,
@@ -143,6 +147,29 @@ namespace FutureSight.lib
             Splittable = splittable;
             RefSplittedCardName = refSplittedCardName;
             Score = score;
+            
+            ManaActivations = new List<MTGManaActivation>();
+            HandActivations = new List<MTGActivation>();
+            GraveyardActivations = new List<MTGActivation>();
+            ExileActivation = new List<MTGActivation>();
+            ParseActivations(ability);
+        }
+        
+        private void ParseActivations(List<string> abilities)
+        {
+            foreach (var ab in abilities)
+            {
+                foreach (var parser in MTGRuleTextParser.ParseList)
+                {
+                    var obj = parser.Parse(ab);
+                    if (obj is MTGManaActivation)
+                    {
+                        Console.WriteLine("read ManaActivation.");
+                        ManaActivations.Add(obj);
+                        break;
+                    }
+                }
+            }
         }
         
         public static CardType GetCardType(string cardType)

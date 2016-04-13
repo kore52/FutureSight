@@ -34,7 +34,7 @@ namespace FutureSight.lib
 
         public override bool IsValid()
             => false;
-
+            
         static public MTGChoice GetInstance()
         {
             if (instance == null) instance = new MTGPlayChoice();

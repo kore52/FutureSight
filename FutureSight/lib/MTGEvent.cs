@@ -37,6 +37,7 @@ namespace FutureSight.lib
         /// イベントの発生源
         /// </summary>
         public MTGSource Source { get; private set; }
+        public MTGPermanent Permanent { get { return (MTGPermanent)Source; } }
 
         /// <summary>
         /// イベントのアクション
@@ -48,31 +49,31 @@ namespace FutureSight.lib
         /// イベント実行中は値を保持する(イベントが終わるとnullクリア)
         ///   例：対象のクリーチャーの場合 -> クリーチャー一覧がリストに存在する
         /// </summary>
-        public MTGChoiceResults Chosen { get; private set; }
+        public MTGPlayChoiceResult Chosen { get; private set; }
         public MTGTarget ChosenTarget { get; private set; }
         
-        
+        public string Descriptions;
         
         public MTGEvent() { }
-        public MTGEvent(MTGSource source, MTGPlayer player, List<MTGTarget> targets, MTGChoice choice, MTGEventAction action)
+        public MTGEvent(MTGSource source, MTGPlayer player, List<MTGTarget> targets, MTGChoice choice, MTGEventAction action, string descriptions)
         {
             Source = source;
             Player = player;
             Targets = targets;
             Choice = choice;
             Action = action;
+            Descriptions = descriptions;
             
             Console.WriteLine("AddEvent: " + this.GetType().ToString());
         }
-
-        public MTGEvent(MTGPlayer player, List<MTGTarget> targets, MTGChoice choice, MTGEventAction action)
-            : this(null, player, targets, choice, action) {}
-
-        public MTGEvent(MTGPlayer player, List<MTGTarget> targets, MTGEventAction action)
-            : this(null, player, targets, null, action) {}
-
-        public MTGEvent(MTGSource source, MTGEventAction action)
-            : this(source, source.Controller, null, null, action) {}
+        public MTGEvent(MTGPlayer player, List<MTGTarget> targets, MTGChoice choice, MTGEventAction action, string descriptions)
+            : this(null, player, targets, choice, action, descriptions) {}
+        public MTGEvent(MTGSource source, MTGPlayer player, List<MTGTarget> targets, MTGEventAction action, string descriptions)
+            : this(source, player, targets, null, action, descriptions) {}
+        public MTGEvent(MTGPlayer player, List<MTGTarget> targets, MTGEventAction action, string descriptions)
+            : this(null, player, targets, null, action, descriptions) {}
+        public MTGEvent(MTGSource source, MTGEventAction action, string descriptions)
+            : this(source, source.Controller, null, null, action, descriptions) {}
 
         public void ExecuteEvent(MTGGame game, MTGChoiceResults choiceResults)
         {
@@ -108,7 +109,6 @@ namespace FutureSight.lib
         {
             return target;
         }
-        
     }
     
 }

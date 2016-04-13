@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FutureSight.lib
 {
     [Serializable()]
-    public class MTGPermanent
+    public class MTGPermanent : MTGSource
     {
         public PermanentType PermanentType { get; set; }
         public int ID { get; }

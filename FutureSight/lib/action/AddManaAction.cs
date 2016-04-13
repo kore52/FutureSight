@@ -13,12 +13,12 @@ namespace FutureSight.lib
     public class AddManaActivation : MTGActivation
     {
         private AddManaType manaType;
-        private MTGManaSymbolList manaSymbolList;
+        private List<MTGManaType> manaTypeList;
 
-        public AddManaActivation(List<MTGCost> costList, AddManaType manaType, MTGManaSymbolList manaSymbolList)
+        public AddManaActivation(List<MTGCost> costList, AddManaType manaType, List<MTGManaType> manaTypeList)
         {
             this.manaType = manaType;
-            this.manaSymbolList = manaSymbolList;
+            this.manaTypeList = manaTypeList;
         }
     }
 }

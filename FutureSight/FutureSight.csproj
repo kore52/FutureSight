@@ -61,7 +61,6 @@
     <Compile Include="lib\MTGGame.cs" />
     <Compile Include="lib\MTGAction.cs" />
     <Compile Include="lib\MTGActivation.cs" />
-    <Compile Include="lib\MTGManaActivation.cs" />
     <Compile Include="lib\MTGManaType.cs" />
     <Compile Include="lib\MTGRuleTextParser.cs" />
     <Compile Include="lib\MTGChoice.cs" />
@@ -79,7 +78,10 @@
     <Compile Include="lib\MurmurHash.cs" />
     <Compile Include="lib\MTGPlayer.cs" />
     <Compile Include="lib\MTGSource.cs" />
+    <Compile Include="lib\MTGSourceActivation.cs" />
     <Compile Include="lib\MTGStackItem.cs" />
+    <Compile Include="lib\MTGObject.cs" />
+    <Compile Include="lib\MTGCollections.cs" />
     <Compile Include="lib\action\AddManaAction.cs" />
     <Compile Include="lib\action\AddEventAction.cs" />
     <Compile Include="lib\action\ChangeStateAction.cs" />
@@ -89,10 +91,9 @@
     <Compile Include="lib\action\TapAction.cs" />
     <Compile Include="lib\action\ResolveStackAction.cs" />
     <Compile Include="lib\Utilities.cs" />
-    <Compile Include="lib\MTGObject.cs" />
-    <Compile Include="lib\MTGCollections.cs" />
     <Compile Include="lib\event\TakePriorityEvent.cs" />
     <Compile Include="lib\event\TapEvent.cs" />
+    <Compile Include="lib\TapManaActivation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

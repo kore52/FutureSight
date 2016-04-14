@@ -75,20 +75,20 @@ namespace FutureSight.lib
             select mana;
 
         // {T} : Add {X} to your mana pool.
-        public static readonly Parser<MTGManaActivation> TapAddManaActivation = 
+        public static readonly Parser<TapManaActivation> TapManaActivationParser = 
             from cost in TapSymbol
             from _ in Colon
             from _add in Parse.String("Add").Token().Text()
             from mana in ManaSymbolGrammer.Many()
             from _tymp in Parse.String("to your mana pool.").Token().Text()
-            select new MTGManaActivation(MTGManaActivation.Create(cost, new List<MTGManaType>(mana.ToList())));
+            select new TapManaActivation(TapManaActivation.Create(cost, new List<MTGManaType>(mana.ToList())));
 
         public static readonly object[] ParseList =
             {
-                TapAddManaActivation
+                TapManaActivationParser
             };
         
-        public List<MTGActivation> Build(string activationString)
+        public List<MTGActivation> ParseActivations(string activationString)
         {
             var actsResult = new List<MTGActivation>();
             var activations = activationString.Split('|');
@@ -101,7 +101,20 @@ namespace FutureSight.lib
         
         private MTGActivation ParserActivation(string activation)
         {
-            var result = ActivationAbility.Parse(activation);
+            foreach (var parser in MTGRuleTextParser.ParseList)
+            {
+                if (parser is Parser<MTGManaActivation>)
+                {
+                    var castParser = (Parser<MTGManaActivation>)parser;
+                    var obj = castParser.Parse(ab);
+                    if (obj is MTGManaActivation)
+                    {
+                        Console.WriteLine("read ManaActivation.");
+                        ManaActivations.Add(obj);
+                        break;
+                    }
+                }
+            }
             return result;
         }
         

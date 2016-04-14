@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Sprache;
 
 namespace FutureSight.lib
 {
@@ -161,9 +162,9 @@ namespace FutureSight.lib
             {
                 foreach (var parser in MTGRuleTextParser.ParseList)
                 {
-                    var obj = parser.Parse(ab);
-                    if (obj is MTGManaActivation)
+                    if (parser is TapManaActivation)
                     {
+                        var obj = ((Parser<TapManaActivation>)parser).Parse(ab);
                         Console.WriteLine("read ManaActivation.");
                         ManaActivations.Add(obj);
                         break;

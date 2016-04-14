@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 namespace FutureSight.lib
 {
     /// <summary>
-    /// カードの効果やカード自体をプレイする行動を既定するインターフェイス
     /// </summary>
-    public class MTGActivation
+    public abstract class MTGActivation
     {
     }
 }

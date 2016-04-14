@@ -12,7 +12,7 @@ namespace FutureSight.lib
     public class TakePriorityEvent : MTGEvent
     {
         public TakePriorityEvent(MTGPlayer player)
-            : base(null, player, null, null, EventAction, "Take priority") { }
+            : base(null, player, null, null, EventAction, "Take priority.") { }
         
         public static MTGEventAction EventAction;
         
@@ -52,18 +52,18 @@ namespace FutureSight.lib
                     foreach (var costEvent in playChoiceResult.SourceActivation.CostEvent)
                     {
                         if (!costEvent.HasChoice())
-                            game.ExecuteEvent(costEvent);
+                            game.ExecuteEvent(costEvent, MTGEvent.NoChoiceResults);
                     }
                     
                     // 選択を用いるコストの支払い: マナコスト等
                     foreach (var costEvent in playChoiceResult.SourceActivation.CostEvent)
                     {
                         if (costEvent.HasChoice())
-                            game.ExecuteEvent(costEvent);
+                            game.AddEvent(costEvent);
                     }
                     
                     // 選択した行動の実行
-                    game.AddEvent(playChoiceResult.Event);
+                    game.AddEvent(playChoiceResult.SourceActivation.Event);
                 }
             });
         }

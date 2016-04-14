@@ -17,7 +17,7 @@ namespace FutureSight.lib
         Green = 0x10,
     }
 
-    public enum ManaSymbol
+    public enum ManaType
     {
         // basic mana
         White,

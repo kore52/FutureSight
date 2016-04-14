@@ -11,7 +11,7 @@ namespace FutureSight.lib
 {
     public class MTGEvent
     {
-        public static MTGEvent NoChoiceResults = new MTGEvent();
+        public static MTGChoiceResults NoChoiceResults = new MTGChoiceResults();
 
         /// <summary>
         /// イベントのコントロールプレイヤー
